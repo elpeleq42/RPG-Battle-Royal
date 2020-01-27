@@ -1,2 +1,2 @@
 Local Server - ws://localhost:1000
-testserv - ws://0.tcp.ngrok.io:15725
+testserv - ws://0.tcp.ngrok.io:15601
