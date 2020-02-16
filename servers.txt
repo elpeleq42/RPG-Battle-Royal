@@ -1,2 +1,2 @@
 Local Server - ws://localhost:1000
-testserv - ws://0.tcp.ngrok.io:15601
+Main 1 - ws://al3x10m.go.ro:1000
