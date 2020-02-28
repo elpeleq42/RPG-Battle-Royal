@@ -1,2 +1,2 @@
 Local Server - ws://localhost:1000
-Main 1 - ws://5.14.238.175:1000
+Main 1 - ws://5.14.240.235:1000
