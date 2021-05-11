@@ -1,0 +1,24 @@
+Scripts:
+HUDELL - OrangeMoveCharacterTo
+HUDELL - Mapscreenshot
+Mog - Footsteps
+Biud436 - RS_InputDialog
+HIME - CommonEventQueue
+Yanfly - YEP_EventSpawner(modified)
+Yanfly - YEP_ItemCore
+Yanfly - YEP_PictureCommonEvents
+Yanfly - YEP_StopMapMovement
+Yanfly - YEP_OptionsCore(modified)
+Yanfly - YEP_FpsSynchOption
+Yanfly - YEP_AnimateTilesOption
+Yanfly - KeyboardConfig(modified)
+Yanfly - GamepadConfig
+Yami - Skip Title
+Nelderson - MV Online (Chat plugin, modified)
+Chaucer - Game Scene Stabilizer
+Irina - PerformanceUpgrade
+
+
+Audio:
+Steps on water/ground sound effects obtained from the original Counter-Strike Copyright © Valve Corporation
+Coconut sound effects obtained from https://www.zapsplat.com

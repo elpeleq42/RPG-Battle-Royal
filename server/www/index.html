@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Server</title>
+</head>
+<body>
+<script type="text/javascript" src="serverscript.js"></script>
+
+
+	<div style="float: left;">
+		<b>Max players</b><br>
+		<input maxlength="4" style="width: 125px;" id="maxplayers" value="100" onchange="maxplayers()"><br><br>
+		<b>Server's Port</b><br>
+		<input maxlength="4" style="width: 125px;" id="serverportnumber" value="1000" onchange="serverportnumber()"><br><br>
+		<b>Server's Map</b><br>
+		<select id="listselect" onChange="return mapselect(this.options[this.selectedIndex].value);">
+  			<option selected="" value="default" >Battle Royal</option>
+  			<option value="free4all" >Free For All</option>
+    		<option value="url" >URL</option>
+    		<option value="file">File</option>
+		</select>
+		<div id="formater"></div><br>
+		<input id="mapurl" style="visibility: hidden;width: 130px;position: absolute;" onchange="servmap=this.value"></input><br>
+		<input id="fileselect" style="visibility: hidden;width: 130px;top: -16px;position: relative;" type="file" onchange="file()"></input>
+		
+	</div>
+	<div style="float: right;padding-right: 20px;">
+		<b>Initial Gold</b><br>
+		<input type="number" value="0" id="ingold" style="width: 125px;" onchange="initgold=this.value"><br><br>
+		<b>Admin Pass</b><br>
+		<input maxlength="10" style="width: 125px;" id="adpass" onchange="adminpassword=this.value"><br><br>
+		<b>Server Pass</b><br>
+		<input maxlength="10" style="width: 125px;" id="serpass" onchange="servpass=this.value"><br><br>
+		<div id="upspeeddiv" style="visibility: hidden;">
+			<b>Map upload speed:</b><br>
+			<input type="number" value="0" id="mapupspeed" style="width: 125px;" onchange="upspeed=this.value"><br>
+			<center><a>(In MB/s)</a></center>
+		</div>
+	</div>
+
+<button style="position: fixed;bottom: 2px;right:115px;" id='start' onclick="var script = document.createElement('script');script.src = '/www/gameserver.js';document.head.appendChild(script);document.getElementById('start').disabled=true;document.getElementById('fileselect').disabled=true;document.getElementById('mapurl').disabled=true;document.getElementById('listselect').disabled=true;document.getElementById('serverportnumber').disabled=true;document.getElementById('maxplayers').disabled=true;document.getElementById('ingold').disabled=true;document.getElementById('serpass').disabled=true;document.getElementById('mapupspeed').disabled=true;document.getElementById('adpass').disabled=true;document.getElementById('start').innerText='Server Running'">Start Server</button>
+</body>
+</html>

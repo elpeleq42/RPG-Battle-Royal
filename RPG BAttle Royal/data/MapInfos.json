@@ -1,0 +1,10 @@
+[
+null,
+{"id":1,"expanded":true,"name":"defaultMap","order":1,"parentId":0,"scrollX":2596,"scrollY":3308},
+{"id":2,"expanded":false,"name":"spawnmap","order":2,"parentId":0,"scrollX":659,"scrollY":371},
+{"id":3,"expanded":false,"name":"servers","order":3,"parentId":0,"scrollX":659,"scrollY":371},
+{"id":4,"expanded":false,"name":"testmap","order":4,"parentId":0,"scrollX":2943,"scrollY":1089},
+{"id":5,"expanded":false,"name":"Custom Map","order":5,"parentId":0,"scrollX":878.6666666666666,"scrollY":494.6666666666667},
+{"id":6,"expanded":false,"name":"Free for All","order":6,"parentId":0,"scrollX":2604,"scrollY":2212},
+{"id":7,"expanded":false,"name":"Zombies","order":7,"parentId":0,"scrollX":2604,"scrollY":2276}
+]
