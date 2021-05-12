@@ -344,7 +344,7 @@ Scene_Map.prototype.createupdatetext = function(){
       document.getElementById('updatetext').innerHTML=`<a href="javascript: void(0)" style="color:white;" onclick="updater()">Update Available. Click here to update</a>`
     }else{
       
-      document.getElementById('updatetext').innerHTML=`<a href="javascript: void(0)" style="color:white;">No new Updates</a>`
+      document.getElementById('updatetext').innerHTML=`<p style="color:white;">Version `+fs.readFileSync('./www/version.txt',{encoding:'utf8', flag:'r'})+`</p>`
     }
 
 
