@@ -12,7 +12,6 @@ Scene_Map.prototype.createDisplayObjects = function() {
   this.createGoldText();
 document.getElementById('goldtext').innerText="Gold:0"
   this.createMinimap();
-  this.createDonationBox();
   this.createupdatetext();
   this.createShieldPIC();
   this.createCancelButton();
@@ -186,12 +185,20 @@ document.getElementById('goldtext').innerText="Gold: " + value
 
 var thereisaminimapfile
  Scene_Map.prototype.createMinimap = function(){
-  if(document.getElementById('minimap') || ($gameMap._mapId!=1 && $gameMap._mapId!=5)) return
+  if(document.getElementById('minimap') || $gameMap._mapId==3) return
 
       var waitcreateminimap=setInterval(()=>{
       if (SceneManager._scene instanceof Scene_Map) {
       screenshotmap()
       clearInterval(waitcreateminimap)
+
+      this.playerindicator = document.createElement('div');
+      this.playerindicator.style.backgroundColor="red"
+      this.playerindicator.style.width="4px"
+      this.playerindicator.style.height="4px"
+      this.playerindicator.id="playerindicator"
+      this.playerindicator.visibility="hidden"
+      this.playerindicator.style.zIndex=99
 
       this.minimap = document.createElement('img');
       this.minimap.id = 'minimap';
@@ -204,9 +211,14 @@ var thereisaminimapfile
 
       document.body.appendChild(this.minimap)
       Graphics._centerElement(this.minimap);
+      document.body.appendChild(this.playerindicator)
+      Graphics._centerElement(this.playerindicator);
 
       document.getElementById('minimap').style.right=(Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*-9/10)+"px"
       document.getElementById('minimap').style.top=(Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*-84/100)+"px"
+
+document.getElementById("playerindicator").style.right=((Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*-9/10)+96)+"px"
+document.getElementById("playerindicator").style.top=((Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*-84/100)-96)+"px"
 
       }
       },200)
@@ -221,6 +233,7 @@ var ishudon=false
 var checkifminimapisdone
  function turnHUDonoff(){
   if(ishudon===true){
+    document.getElementById('updatetext').style.visibility="visible"
     document.getElementById('goldtext').style.visibility="hidden"
     document.getElementById('userpic').style.visibility="hidden"
     document.getElementById('HPBar').style.visibility="hidden"
@@ -229,6 +242,7 @@ var checkifminimapisdone
       checkifminimapisdone=setInterval(()=>{
         if(document.getElementById('minimap')){
           document.getElementById('minimap').style.visibility="hidden"
+          document.getElementById('playerindicator').style.visibility="hidden"
           clearInterval(checkifminimapisdone)
         }
       },200)
@@ -236,6 +250,7 @@ var checkifminimapisdone
     ishudon=false
   }
   else{
+    document.getElementById('updatetext').style.visibility="hidden"
     document.getElementById('goldtext').style.visibility="visible"
     document.getElementById('userpic').style.visibility="visible"
     document.getElementById('HPBar').style.visibility="visible"
@@ -244,6 +259,7 @@ var checkifminimapisdone
       checkifminimapisdone=setInterval(()=>{
         if(document.getElementById('minimap')){
           document.getElementById('minimap').style.visibility="visible"
+          document.getElementById('playerindicator').style.visibility="visible"
           clearInterval(checkifminimapisdone)
         }
       },200)
@@ -252,26 +268,7 @@ var checkifminimapisdone
   }
  }
 
-Scene_Map.prototype.createDonationBox = function(){
 
-this.donationbox = document.createElement('div');
-this.donationbox.id = 'donationbox';
-this.donationbox.style.zIndex = 99;
-
-this.donationbox.style.visibility="visible"
-document.body.appendChild(this.donationbox)
-Graphics._centerElement(this.donationbox);
-
-document.getElementById('donationbox').innerHTML=`<a href="javascript:window.opener.require('nw.gui').Shell.openExternal('https://www.patreon.com/bePatron?u=25774756');"><img src="img/system/patreon.png" width=190" height="47"></a>`
-this.donationbox.style.width = '147px';
-this.donationbox.style.height = '47px';
-document.getElementById('donationbox').style.right=(Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*-3/4)+"px"
-document.getElementById('donationbox').style.top=(Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*84/100)+"px"
-
-
-
-
-}
 
 
 function download(url, dest, callback) {
@@ -401,69 +398,81 @@ document.getElementById('cancelbutton').style.top=(Number(document.getElementByI
 
 previousgamex=undefined
 previousgamey=undefined
-setInterval(()=>{
-
-if(previousgamex==undefined){
-previousgamex=1280
-previousgamey=720
-}
-
-if(previousgamey==document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2) && previousgamex==document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2)) return
+var playerxonmini,playeryonmini
 
 
+function intervalchecker(){
 
+  if(previousgamex==undefined){
+  previousgamex=1280
+  previousgamey=720
+  }
+  
+  document.getElementById("playerindicator").style.right=((Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*-9/10)+(100-$gamePlayer._x*96/Math.floor($dataMap.width*48/100)))+"px"
+  document.getElementById("playerindicator").style.top=((Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*-84/100)-(100-$gamePlayer._y*96/Math.floor($dataMap.height*48/100)))+"px"
+  
+  
+  
+  if(previousgamey==document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2) && previousgamex==document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2)) return
+  
+  
+  
+  
+  var gamex=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*3/4
+  var gamey=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*3/4
+  
+  
+  var gamex2=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*9/10
+  var gamey2=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*9/10
+  
+  
+  var gamex3=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*12/20
+  var gamey3=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*14/20
+  
+  
+  var gamex4=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*84/100
+  var gamey4=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*84/100
+  
+  try{document.getElementById('loadingtext').style.left="-"+(gamex2)+"px"
+  document.getElementById('loadingtext').style.top=(gamey4)+"px"
+  
+  document.getElementById('playerindicator').style.right="-"+(gamex2+96)+"px"
+    document.getElementById('playerindicator').style.top="-"+(gamey4-96)+"px"
+  
+  document.getElementById('HPLimit').style.left="-"+(gamex2)+"px"
+  document.getElementById('HPLimit').style.top="-"+(gamey3)+"px"
+  
+  document.getElementById('MPLimit').style.left="-"+(gamex2)+"px"
+  document.getElementById('MPLimit').style.top="-"+(gamey3-32)+"px"
+  
+  document.getElementById('userpic').style.left="-"+(gamex2)+"px"
+  document.getElementById('userpic').style.top="-"+(gamey3+106)+"px"
+  
+  document.getElementById('goldtext').style.left="-"+(gamex2-90)+"px"
+  document.getElementById('goldtext').style.top="-"+(gamey3+106)+"px"
+  
+  if(document.getElementById('minimap')){document.getElementById('minimap').style.right="-"+(gamex2)+"px"
+    document.getElementById('minimap').style.top="-"+(gamey4)+"px"}
+    
 
-var gamex=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*3/4
-var gamey=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*3/4
-
-
-var gamex2=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*9/10
-var gamey2=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*9/10
-
-
-var gamex3=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*12/20
-var gamey3=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*14/20
-
-
-var gamex4=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*84/100
-var gamey4=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*84/100
-
-try{document.getElementById('loadingtext').style.left="-"+(gamex2)+"px"
-document.getElementById('loadingtext').style.top=(gamey4)+"px"
-
-
-document.getElementById('HPLimit').style.left="-"+(gamex2)+"px"
-document.getElementById('HPLimit').style.top="-"+(gamey3)+"px"
-
-document.getElementById('MPLimit').style.left="-"+(gamex2)+"px"
-document.getElementById('MPLimit').style.top="-"+(gamey3-32)+"px"
-
-document.getElementById('userpic').style.left="-"+(gamex2)+"px"
-document.getElementById('userpic').style.top="-"+(gamey3+106)+"px"
-
-document.getElementById('goldtext').style.left="-"+(gamex2-90)+"px"
-document.getElementById('goldtext').style.top="-"+(gamey3+106)+"px"
-
-if(document.getElementById('minimap')){document.getElementById('minimap').style.right="-"+(gamex2)+"px"
-  document.getElementById('minimap').style.top="-"+(gamey4)+"px"}
-
-document.getElementById('donationbox').style.right="-"+(gamex)+"px"
-document.getElementById('donationbox').style.top=(gamey4)+"px"
-
-document.getElementById('shieldpic').style.left="-"+(gamex)+"px"
-document.getElementById('shieldpic').style.top="-"+(gamey)+"px"
-
-document.getElementById('cancelbutton').style.left=(gamex)+"px"
-document.getElementById('cancelbutton').style.top=(gamey)+"px"
-
-document.getElementById('txtarea').style.left = "-"+(gamex3)+"px"
-document.getElementById('txtarea').style.top = (gamey4-223)+"px"
-
-document.getElementById('chatInput').style.left = "-"+(gamex3+30)+"px"
-document.getElementById('chatInput').style.top = (gamey4)+"px"}catch(e){}
-
-
-
-},100)
+  
+  document.getElementById('shieldpic').style.left="-"+(gamex)+"px"
+  document.getElementById('shieldpic').style.top="-"+(gamey)+"px"
+  
+  document.getElementById('cancelbutton').style.left=(gamex)+"px"
+  document.getElementById('cancelbutton').style.top=(gamey)+"px"
+  
+  document.getElementById('txtarea').style.left = "-"+(gamex3)+"px"
+  document.getElementById('txtarea').style.top = (gamey4-223)+"px"
+  
+  
+  
+  document.getElementById('chatInput').style.left = "-"+(gamex3+30)+"px"
+  document.getElementById('chatInput').style.top = (gamey4)+"px"}catch(e){}
+  
+  
+  
+  }
+setInterval(intervalchecker,100)
 
 

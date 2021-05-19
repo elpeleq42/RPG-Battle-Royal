@@ -18,7 +18,8 @@ Changes:
 -New UI that shows kills, name and ID(default key: TAB).
 -Client now shows how fast you're downloading a custom map.
 -Now if the player isn't running, they won't make footstep noises anymore.
-
+-Minimap now displays a red dot indicating player position on the map.
+-Removed the patreon button.
 
 Fixes:
 -Fixed minor collision problems on default map.
