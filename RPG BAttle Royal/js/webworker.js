@@ -154,7 +154,7 @@ self.onmessage = function(e) {
 
 	}else if(value.startsWith("name")){
 		name=value.split(":");name.shift();name=name.join(":")
-	}else if(value.startsWith("sendposition")){
+	}else if(value.startsWith("sendposition") ){
 		value=value.split(":")
 		value.shift();value=value.join(":")
 		connection.send(encrypt(value));

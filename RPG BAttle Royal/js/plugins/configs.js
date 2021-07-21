@@ -23,6 +23,7 @@ if(localStorage.fullscreen=="true"){
 
 //changes to MV's functions
 Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType,check) {
+    if(x=='NaN' || y=='NaN') return
     if(check==true || ($gameMap._mapId!=1 && $gameMap._mapId<5 )){
         this._transferring = true;
         if($gameMap._mapId==1 || $gameMap._mapId>4){
@@ -343,6 +344,34 @@ if(!localStorage.texttospeech){
 
 
 
+function changechat(chatText1){
+    var chatText=chatText1
+	chatText=chatText.replace(/:c/ig,"😕")
+    chatText=chatText.replace(/:\)/g,"😕")
+	chatText=chatText.replace(/lmao/ig,"😂")
+	chatText=chatText.replace(/xD/ig,"😆")
+	chatText=chatText.replace(/<3/g,"🧡")
+	chatText=chatText.replace(/o\//ig,"👋")
+	chatText=chatText.replace(/eyeemoji/ig,"👀")
+	chatText=chatText.replace(/:d/ig,"😀")
+	chatText=chatText.replace(/>:\)/g,"😈")
+	chatText=chatText.replace(/derpemoji/ig,"🤪")
+	chatText=chatText.replace(/shrugemoji/ig,"🤷")
+    
+    return chatText
+}
+
+/////////improve scene update performance////////////
+
+Scene_Base.prototype.updateChildren = function() {
+
+    for(var i=0;i<this.children.length;i++){
+        if (this.children[i].update) {
+            this.children[i].update();
+        }
+    }
+
+};
 
 ///////
 
