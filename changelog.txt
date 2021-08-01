@@ -20,12 +20,15 @@ Changes:
 -Player also changes skin randomly when they join a server.
 -When a player dies, the screen now turns grey for them and there will blood where they were to indicate someone died in that spot. The server now also announces when a player dies and, depending on game mode, it will announce the amount of players left(both in chat).
 -Added emojis to chat
+-Added new /w and /whisper chat commands for sending a private message to a player in game.
+-Removed upload limits for throttling the upload
 
 Optimizations:
 -The game's zip file is now 25% smaller.
 -Messages are better encrypted and encryption/decryption should be 10% faster aswell.
 -Many server functions are no longer anonymous, being now properly cached. This should nearly double their performance.
 -Several micro optimizations for the client.
+-Amount of messages sent between client and server has been reduced, saving up data and server processing.
 
 Fixes:
 -Fixed minor collision problems on default map.
@@ -40,3 +43,4 @@ Fixes:
 -Fixed issue where you would drop the chest if pressed the drop key while chat is open.
 -Fixed server allowing a player to be teleport to a NaN position, which would result in a blackscreen
 -Fixed issues with sending gold to the player that got a kill in certain occasions
+-Fixed issues related to players not showing up, or names randomly showing up even without a player being there. Hopefully a definitive fix for this issue.

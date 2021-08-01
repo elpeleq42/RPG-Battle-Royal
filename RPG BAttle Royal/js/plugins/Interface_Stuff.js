@@ -194,8 +194,8 @@ var thereisaminimapfile
 
       this.playerindicator = document.createElement('div');
       this.playerindicator.style.backgroundColor="red"
-      this.playerindicator.style.width="4px"
-      this.playerindicator.style.height="4px"
+      this.playerindicator.style.width=(Math.round((200/$gameMap.width())<1?1:200/$gameMap.width())+"px")
+      this.playerindicator.style.height=(Math.round((200/$gameMap.height())<1?1:200/$gameMap.height())+"px")
       this.playerindicator.id="playerindicator"
       this.playerindicator.visibility="hidden"
       this.playerindicator.style.zIndex=99

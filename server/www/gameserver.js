@@ -16,8 +16,9 @@ try{
 	var serverpass=servpass || undefined	   //
 	var map=servmap	|| "default"			  // default, free4all, a link or full file path
 	const tickrate=30            			 // Between 1 and 1000
-	const maxafktime=120                    // Above 0
-	/////////////////////////////////////////
+	const maxafktime=120                    // Above 0, in seconds
+	const maxkills=25                      //above 0, amount of kills before reset on free for all
+	////////////////////////////////////////
 	
 	
 	
@@ -57,7 +58,7 @@ try{
 	
 
 	
-			breakup=Math.ceil(map.length/(102400*upspeedmap))
+			breakup=Math.ceil(map.length/(204800*upspeedmap))
 			forsize=Math.ceil(map.length/breakup)
 			arrbuffer=new Array(breakup)
 			for(var i=0;i<breakup;i++){
@@ -76,7 +77,10 @@ try{
 	}
 	servmap=undefined
 	
-		function map_upload_process(tobindex,time){
+		function map_upload_process(_tobindex,time){
+			tobindex=_tobindex
+			tobindex++
+			console.log(tobindex)
 			var tempslice
 			var serverconnections=server.connections
 			if(tobeuploaded[tobindex]==undefined && tobeuploaded.length>0){
@@ -99,18 +103,18 @@ try{
 					}
 					
 					if(tobeuploaded[tobindex][1]==breakup){
+
 						tobeuploaded.splice(tobindex,1);
 						serverconnections[u]._sendText("finished");
 						serverconnections[u].close()
 					}
 					if(tobeuploaded.length>0){ 
-						if(tobeuploaded.length>=5){
-							mapupload(tobindex++,100)
-						}else{
-							mapupload(tobindex++,Math.ceil(500/tobeuploaded.length))
-						}
+						
+						
+							mapupload(tobindex++,Math.ceil(1000/tobeuploaded.length))
+						
+						
 					}
-					break
 					return
 				}
 			}
@@ -141,13 +145,10 @@ try{
 						serverconnections[u].close()
 					}
 					if(tobeuploaded.length>0){ 
-						if(tobeuploaded.length>=5){
-							mapupload(tobindex++,100)
-						}else{
-							mapupload(tobindex++,Math.ceil(500/tobeuploaded.length))
-						}
+						
+							mapupload(tobindex++,Math.ceil(1000/tobeuploaded.length))
+						
 					}
-					break
 					return
 				}
 			}
@@ -233,6 +234,7 @@ try{
 		connection.msgcounter=0
 		connection.todo=[]
 		connection.afkcount=0
+		connection.killcount=0
 		if(serverpass!==undefined){
 			connection.sentpass=false
 		}
@@ -276,6 +278,8 @@ try{
 				if(arrbuffer!=undefined){
 					connection.tempID=getRandomInt(0,9999999)
 					tobeuploaded.push([connection.tempID,0])
+
+					console.log(tobeuploaded)
 					if(tobeuploaded.length==1) mapupload(0,500)
 	
 				}else if(map!="filecustom"){
@@ -290,7 +294,8 @@ try{
 				if(arrbuffer!=undefined){
 					connection.tempID=getRandomInt(0,9999999)
 					tobeuploaded.push([connection.tempID,0])
-					
+
+					console.log(tobeuploaded)
 					if(tobeuploaded.length==1) mapupload(0,500)
 	
 				}else if(map!="filecustom"){
@@ -526,6 +531,12 @@ try{
 					if(Number(server.connections[i].playerid)==idtosend){
 						if(str1.endsWith("player")){
 							server.connections[i]._sendText("receivegold:"+getRandomInt(30,51)+":player")
+							server.connections[i].killcount++
+							if(server.connections[i].killcount>=maxkills && map=="free4all"){
+								broadcast("message:"+server.connections[i].playername+` has won!.
+								Kill count:`+server.connections[i].killcount+"\\|\\^")
+								setTimeout(begingamefree4all, 500);
+							}
 						}else{
 							server.connections[i]._sendText("receivegold:"+getRandomInt(30,51))
 						}
@@ -618,40 +629,58 @@ try{
 						connection.adm=true
 						connection.todo.push("chat::You're now admin!")
 					}
+				}if(str2.indexOf("/w")==0 || str2.indexOf("/whisper")==0){
+
+					for(var i=server.connections.length;i--;){
+						if(str2.split(" ")[1]==server.connections[i].playerid){
+							server.connections[i].todo.push("chat:"+connection.playername+":"+str2.split(" ").slice(2,str2.split(" ").length).join(" "))
+							break
+						}
+					}
 				}
-				else if(str2.indexOf("/list")==0){
+				else if(str2.indexOf("/list")==0 || str2.indexOf("/playerlist")==0){
 					server.connections.forEach(function (connectionn) {
 						if(connectionn.playerid!==null && connectionn.playername!==null){
-							connection.todo.push("chat::>ID:"+connectionn.playerid+", name:"+connectionn.playername)
+							connection.todo.push("chat::"+connectionn.playername+" - ID:"+connectionn.playerid)
 						}
 	
 					})
-				}
-				else if(str2.indexOf("/kick")==0 && connection.adm===true){
+				}else if(str2.indexOf("/commands")==0){
+					connection.todo.push(`chat::/kick
+					/ban
+					/adm
+					/closeserver
+					/openserver
+					/mute
+					/list
+					/whisper
+					/begin`)
+				}else if(str2.indexOf("/kick")==0 && connection.adm===true){
 					str2=str2.split(" ")
-					server.connections.forEach(function (connectionn) {
-	
-						if(connectionn.playerid==str2[1]){
-							broadcast("chat::>"+connectionn.playername+" has been kicked.")
-							connectionn.close()
+					for(var i=server.connections.length;i--;){
+						if(server.connections[i].playerid==str2[1]){
+							broadcast("chat::>"+server.connections[i].playername+" has been kicked.")
+							server.connections[i].close()
+							break
 						}
-					})
+					}
 				}
 				else if(str2.indexOf("/ban")==0 && connection.adm===true){
 					str2=str2.split(" ")
-					server.connections.forEach(function (connectionn) {
-	
-					if(connectionn.playerid==str2[1]){
-						broadcast("chat::>"+connectionn.playername+" has been banned.")
-						connectionn.close()
-						banlist.push([connectionn.playerip,connectionn.headers.origin.split("//")[1]])
+
+					for(var i=server.connections.length;i--;){
+						if(server.connections[i].playerid==str2[1]){
+							broadcast("chat::>"+server.connections[i].playername+" has been banned.")
+							server.connections[i].close()
+							banlist.push([server.connections[i].playerip,server.connections[i].headers.origin.split("//")[1]])
+							break
+						}
 					}
-					})
 				}else if(str2.indexOf("/closeserver")==0 && connection.adm===true){
 					str2=str2.split(" ")
-					server.connections.forEach(function (connectionn) {
-						connectionn.sentpass=true
-					})
+					for(var i=server.connections.length;i--;){
+						server.connections[i].sentpass=true
+					}
 					serverpass=str2[1]
 					connection.todo.push("chat::>Server is now password closed.")
 				}else if(str2.indexOf("/openserver")==0 && connection.adm===true){
@@ -694,12 +723,12 @@ try{
 				if(connection.x!=str1.split(":")[0] || connection.y!=str1.split(":")[1]) connection.afkcount=0
 				connection.x=str1.split(":")[0]
 				connection.y=str1.split(":")[1]
-				broadcast("update:"+connection.playerid+":"+str1)
+				broadcast("update:"+connection.playerid+":"+str1+":"+connection.playername+":"+connection.alive)
 			}else if(serverpass===undefined ){
 				if(connection.x!=str1.split(":")[0] || connection.y!=str1.split(":")[1]) connection.afkcount=0
 				connection.x=str1.split(":")[0]
 				connection.y=str1.split(":")[1]
-				broadcast("update:"+connection.playerid+":"+str1)
+				broadcast("update:"+connection.playerid+":"+str1+":"+connection.playername+":"+connection.alive)
 			}
 			if(on_message){
 				on_message(str1,connection)
@@ -852,6 +881,7 @@ try{
 		nonmovable=[]
 		for(var i=0;i<server.connections.length;i++){
 			server.connections[i].alive=true
+			server.connections[i].killcount=0
 		}
 	
 		if(checkendgame){
@@ -915,7 +945,14 @@ try{
 			serverlock=true
 			checkendgame=setInterval(()=>{
 				if(playersalive<2){
-	
+					for(var i=server.connections.length;i--;){
+						if(server.connections[i].alive==true){
+							broadcast("message:"+server.connections[i].playername+` has won!
+								Kill count:`+server.connections[i].killcount+"\\|\\^")
+							break
+						}
+					}
+					broadcast("message:Game has ended!\\|\\^")
 					reseting=true
 					clearTimeout(spawnmobs)
 					playersalive=numberofplayers
@@ -990,6 +1027,7 @@ try{
 		nonmovable=[]
 		for(var i=0;i<server.connections.length;i++){
 			server.connections[i].alive=true
+			server.connections[i].killcount=0
 		}
 	
 		if(checkendgame){

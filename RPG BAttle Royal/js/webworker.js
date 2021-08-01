@@ -5,6 +5,8 @@ var decodeiv=""
 var name=""
 var connection
 var ping,ip
+var previousposition=""
+var arrayofpositions=[]
 
 function encrypt(text) {
 	if(decodepass=="") return
@@ -102,6 +104,16 @@ self.onmessage = function(e) {
 					}else if(update[i]=="checked"){
 						ping=Math.trunc(performance.now()-ping)
 						self.postMessage("checked:"+ping)
+					}else if(update[i].startsWith("update")){
+						for(var u=arrayofpositions.length;u--;){
+							if(update[i][1]==arrayofpositions[u][1]){
+								arrayofpositions[u]=update[i]
+								self.postMessage(update[i])
+								return
+							}
+						}
+						arrayofpositions.push(update[i])
+						self.postMessage(update[i])
 					}else{
 						self.postMessage(update[i])
 					}
@@ -136,6 +148,16 @@ self.onmessage = function(e) {
 				}else if(update=="checked"){
 					ping=Math.trunc(performance.now()-ping)
 					self.postMessage("checked:"+ping)
+				}else if(update.startsWith("update")){
+					for(var u=arrayofpositions.length;u--;){
+						if(update[1]==arrayofpositions[u][1]){
+							arrayofpositions[u]=update
+							self.postMessage(update)
+							return
+						}
+					}
+					arrayofpositions.push(update)
+					self.postMessage(update)
 				}else{
 					self.postMessage(update)
 				}
@@ -154,10 +176,13 @@ self.onmessage = function(e) {
 
 	}else if(value.startsWith("name")){
 		name=value.split(":");name.shift();name=name.join(":")
-	}else if(value.startsWith("sendposition") ){
+	}else if(value.startsWith("sendposition")){
+		if(previousposition==value) return
+		previousposition=value
 		value=value.split(":")
 		value.shift();value=value.join(":")
 		connection.send(encrypt(value));
+
 	}else if(value=="close"){
 		connection.close()
 	}else{
@@ -169,3 +194,8 @@ self.onmessage = function(e) {
 
 
 
+setInterval(()=>{
+	for(var i=arrayofpositions.length;i--;){
+		self.postMessage(arrayofpositions[i])
+	}
+},100)
