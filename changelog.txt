@@ -22,6 +22,7 @@ Changes:
 -Added emojis to chat
 -Added new /w and /whisper chat commands for sending a private message to a player in game.
 -Removed upload limits for throttling the upload
+-Players now drop the items they were carrying when they die.
 
 Optimizations:
 -The game's zip file is now 25% smaller.

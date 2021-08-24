@@ -27,27 +27,13 @@ try{
 	const ws = require("./lib/index.js")
 	const crypt = require('crypto')
 	const fs   = require('fs')
-	var nonmovable = []
+	var nonmovable= objects= checkobjs= tobeuploaded= banlist=[]
 	var playercounter= new Uint8Array(1001).fill(0)
 	var playernames = new Array(1001).fill("")
-	var giveID=0
-	var disconnectthis
-	var string
-	var numberofplayers=0
-	var serverfull=false
-	var playersalive=0
-	var serverlock=false
-	var checkendgame
-	var highestid=0
-	var objectcounter=0
-	var objects=[]
-	var checkobjs=[]
-	var temp
-	var timelapse=undefined
-	var arrbuffer=undefined
-	var tobeuploaded=[]
-	var banlist=[]
-	var reseting=false
+	var serverfull= serverlock=reseting=false
+	var checkendgame,temp,string, disconnectthis
+	var objectcounter= highestid=playersalive=numberofplayers=giveID=0
+	var timelapse= arrbuffer=undefined
 	
 	
 	
@@ -61,7 +47,7 @@ try{
 			breakup=Math.ceil(map.length/(204800*upspeedmap))
 			forsize=Math.ceil(map.length/breakup)
 			arrbuffer=new Array(breakup)
-			for(var i=0;i<breakup;i++){
+			for(var i=breakup;i--;){
 				arrbuffer[i]=Buffer.allocUnsafe(forsize)
 				map.copy(arrbuffer[i],0,i*forsize,(i+1)*forsize)
 				arrbuffer[i]=arrbuffer[i]
@@ -70,7 +56,7 @@ try{
 	
 	
 		}else{
-			buffer=map.toString('binary')
+			buffer=map.toString('hex')
 			map="filecustom"
 			
 		}
@@ -80,7 +66,6 @@ try{
 		function map_upload_process(_tobindex,time){
 			tobindex=_tobindex
 			tobindex++
-			console.log(tobindex)
 			var tempslice
 			var serverconnections=server.connections
 			if(tobeuploaded[tobindex]==undefined && tobeuploaded.length>0){
@@ -89,14 +74,14 @@ try{
 				for(var u=0;u<serverconnections.length;u++){
 				if(serverconnections[u].tempID==tobeuploaded[tobindex][0]){
 					if(tobeuploaded.length>=5){
-						serverconnections[u]._sendText(Buffer.concat(arrbuffer[tobeuploaded[tobindex][1]]).toString("binary"))
+						serverconnections[u]._sendText(Buffer.concat(arrbuffer[tobeuploaded[tobindex][1]]).toString("hex"))
 						tobeuploaded[tobindex][1]=tobeuploaded[tobindex][1]+1
 					}else{
 						tempslice=arrbuffer.slice(tobeuploaded[tobindex][1],tobeuploaded[tobindex][1]+Math.round(5/tobeuploaded.length))
 						if(tempslice.length===0){
 							tobeuploaded[tobindex][1]=breakup
 						}else{
-							serverconnections[u]._sendText(Buffer.concat(tempslice).toString("binary"))
+							serverconnections[u]._sendText(Buffer.concat(tempslice).toString("hex"))
 							tobeuploaded[tobindex][1]=tobeuploaded[tobindex][1]+Math.round(5/tobeuploaded.length)
 						}
 						
@@ -126,14 +111,14 @@ try{
 			for(var u=0;u<serverconnections.length;u++){
 				if(serverconnections[u].tempID==tobeuploaded[tobindex][0]){
 					if(tobeuploaded.length>=5){
-						serverconnections[u]._sendText(Buffer.concat(arrbuffer[tobeuploaded[tobindex][1]]).toString("binary"))
+						serverconnections[u]._sendText(Buffer.concat(arrbuffer[tobeuploaded[tobindex][1]]).toString("hex"))
 						tobeuploaded[tobindex][1]=tobeuploaded[tobindex][1]+1
 					}else{
 						tempslice=arrbuffer.slice(tobeuploaded[tobindex][1],tobeuploaded[tobindex][1]+Math.round(5/tobeuploaded.length))
 						if(tempslice.length===0){
 							tobeuploaded[tobindex][1]=breakup
 						}else{
-							serverconnections[u]._sendText(Buffer.concat(tempslice).toString("binary"))
+							serverconnections[u]._sendText(Buffer.concat(tempslice).toString("hex"))
 							tobeuploaded[tobindex][1]=tobeuploaded[tobindex][1]+Math.round(5/tobeuploaded.length)
 						}
 						
@@ -250,7 +235,8 @@ try{
 				return
 			}else if(connection.playerdecode!==null){
 				var decipher = crypt.createDecipheriv('aes-128-cbc', connection.playerdecode, connection.playeriv);
-				var decrypted = Buffer.concat([decipher.update(Buffer.from(str,"hex")), decipher.final()]).toString();
+
+				var decrypted = Buffer.concat([decipher.update(Buffer.from(str,"binary")), decipher.final()]).toString();
 				str1=decrypted
 			}else{
 				if(connection.postMessage>5) connection.close()
@@ -258,9 +244,11 @@ try{
 			}
 			if(str1.indexOf("&&")>-1){
 				str1=str1.replace(/&&/g,"")
+			}if(str1==="checkping"){
+				connection._sendText("checked")
 			}
 			
-			if(str==="ping"){
+			else if(str==="ping"){
 				if(serverpass!==undefined){
 					connection._sendText("totalplayers:"+numberofplayers+"/"+maxnumberofplayers+":locked")
 				}else{
@@ -279,7 +267,6 @@ try{
 					connection.tempID=getRandomInt(0,9999999)
 					tobeuploaded.push([connection.tempID,0])
 
-					console.log(tobeuploaded)
 					if(tobeuploaded.length==1) mapupload(0,500)
 	
 				}else if(map!="filecustom"){
@@ -295,7 +282,6 @@ try{
 					connection.tempID=getRandomInt(0,9999999)
 					tobeuploaded.push([connection.tempID,0])
 
-					console.log(tobeuploaded)
 					if(tobeuploaded.length==1) mapupload(0,500)
 	
 				}else if(map!="filecustom"){
@@ -306,9 +292,6 @@ try{
 				}
 			}
 	
-			else if(str1==="checkping"){
-				connection._sendText("checked")
-			}
 	
 			else if (connection.playerid === null && numberofplayers<maxnumberofplayers) {
 				if(!(str1.indexOf("pass")==0) ||( (str1.split(":").length<2 && serverpass!==undefined) || (str1.split(":")[2]!=serverpass && serverpass!==undefined))){
@@ -366,15 +349,13 @@ try{
 				highestid++
 				for(var u=1;u<highestid;u++){
 					connection.todo.push("spawn:"+(1000+u)+":"+playernames[u])
+					if(playercounter[u]===0){
+						broadcast("dead:"+u)
+					}
 					
 				}
-				for(var o=1;o<highestid;o++){
-					if(playercounter[o]===0){
-						broadcast("dead:"+o)
-					}
-				}	
 				
-				for(var i=0;i<objects.length;i++){
+				for(i=objects.length;i--;){
 					objects=objects.filter(Boolean)
 					temp=objects[i];temp=temp.toString().split(":")
 					connection.todo.push("build:"+temp[1]+":"+temp[2]+":"+temp[3]+":"+temp[0]+":"+str1[4]+":"+str1[5])
@@ -459,15 +440,17 @@ try{
 			else if(str1.indexOf("destroy")==0){
 				connection.msgcounter+=5
 				objects=objects.filter(Boolean)
-				for(var i=0;i<objects.length;i++){
+				for(var i=objects.length;i--;){
 					temp=objects[i];temp=temp.split(":")
 					if(temp[0]==str1.split(":")[1] && temp[1]==str1.split(":")[2] && temp[2]==str1.split(":")[3]){
 						objects.splice(i, 1);
 						broadcast(str1)
 	
 						for(var u=0;u<nonmovable.length;u++){
-							if(nonmovable[u].split(":")[0]==str1.split(":")[1]) nonmovable.splice(u,1)
-							break
+							if(nonmovable[u].split(":")[0]==str1.split(":")[1]) {
+								nonmovable.splice(u,1)
+								break
+							}
 						}
 						break;
 					}	
@@ -812,7 +795,7 @@ try{
 					var text=cipher.update(allcons[z].todo.join("&&"))
 					
 					var encrypted = Buffer.concat([text, cipher.final()]);
-					allcons[z]._sendText(encrypted.toString('hex'))
+					allcons[z]._sendText(encrypted.toString('binary'))
 					allcons[z].todo=[]
 			}
 		}

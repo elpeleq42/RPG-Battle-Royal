@@ -373,6 +373,47 @@ Scene_Base.prototype.updateChildren = function() {
 
 };
 
+
+/////////////remove unnecessary verifications//////
+
+SceneManager.update = function() {
+    try {
+        this.tickStart();
+        this.updateManagers();
+        this.updateMain();
+        this.tickEnd();
+    } catch (e) {
+        this.catchException(e);
+    }
+};
+
+
+SceneManager.updateMain = function() {
+    var newTime = this._getTimeInMsWithoutMobileSafari();
+        var fTime = (newTime - this._currentTime) / 1000;
+        if (fTime > 0.25) fTime = 0.25;
+        this._currentTime = newTime;
+        this._accumulator += fTime;
+        while (this._accumulator >= this._deltaTime) {
+            this.updateInputData();
+            this.changeScene();
+            this.updateScene();
+            this._accumulator -= this._deltaTime;
+        }
+    this.renderScene();
+    this.requestUpdate();
+};
+
+SceneManager.resume = function() {
+    this._stopped = false;
+    this.requestUpdate();
+    
+    this._currentTime = this._getTimeInMsWithoutMobileSafari();
+    this._accumulator = 0;
+    
+};
+
+
 ///////
 
 

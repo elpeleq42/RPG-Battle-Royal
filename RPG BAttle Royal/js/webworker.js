@@ -12,23 +12,21 @@ function encrypt(text) {
 	if(decodepass=="") return
 
 	let cipher = crypto.createCipheriv('aes-128-cbc', decodepass, decodeiv);
-	let encrypted = cipher.update(text);
 
-	encrypted = Buffer.concat([encrypted, cipher.final()]);
-	encrypted=encrypted.toString('hex') 
-	return encrypted;
+
+
+	return Buffer.concat([cipher.update(text), cipher.final()]).toString('binary') ;
 }
  
 const decrypt=function (text){
 
 	try{
 
-	let encryptedText = Buffer.from(text,"hex");
+	let encryptedText = Buffer.from(text,"binary");
 	let decipher = crypto.createDecipheriv('aes-128-cbc', decodepass, decodeiv);
-	let decrypted = decipher.update(encryptedText);
 
-	decrypted = Buffer.concat([decrypted, decipher.final()]).toString();
-	return decrypted
+	 
+	return Buffer.concat([decipher.update(encryptedText), decipher.final()]).toString();
 
 	}
     catch(e){
