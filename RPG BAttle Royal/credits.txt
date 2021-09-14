@@ -24,3 +24,5 @@ RPG Maker MV - Kadokawa
 Audio:
 Steps on water/ground sound effects obtained from the original Counter-Strike Copyright © Valve Corporation
 Coconut sound effects obtained from https://www.zapsplat.com
+little_robot_sound_factory_Zombie_00 - From zapsplat - CC Attribution 4 https://creativecommons.org/licenses/by/4.0
+horror_monster_zombie_male_groan_011 obtained from https://www.zapsplat.com

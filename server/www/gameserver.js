@@ -37,7 +37,7 @@ try{
 	
 	
 	
-	if(map!=="default" && map!=="free4all" && !(map.indexOf("http")==0)){
+	if(map!=="default" && map!=="zombies" && map!=="free4all" && !(map.indexOf("http")==0)){
 		var file = process.argv[2],
 		map = fs.readFileSync(servmap);
 		if(upspeedmap!=0){
@@ -56,7 +56,7 @@ try{
 	
 	
 		}else{
-			buffer=map.toString('hex')
+			buffer=map.toString('binary')
 			map="filecustom"
 			
 		}
@@ -74,14 +74,14 @@ try{
 				for(var u=0;u<serverconnections.length;u++){
 				if(serverconnections[u].tempID==tobeuploaded[tobindex][0]){
 					if(tobeuploaded.length>=5){
-						serverconnections[u]._sendText(Buffer.concat(arrbuffer[tobeuploaded[tobindex][1]]).toString("hex"))
+						serverconnections[u]._sendText(Buffer.concat(arrbuffer[tobeuploaded[tobindex][1]]).toString("binary"))
 						tobeuploaded[tobindex][1]=tobeuploaded[tobindex][1]+1
 					}else{
 						tempslice=arrbuffer.slice(tobeuploaded[tobindex][1],tobeuploaded[tobindex][1]+Math.round(5/tobeuploaded.length))
 						if(tempslice.length===0){
 							tobeuploaded[tobindex][1]=breakup
 						}else{
-							serverconnections[u]._sendText(Buffer.concat(tempslice).toString("hex"))
+							serverconnections[u]._sendText(Buffer.concat(tempslice).toString("binary"))
 							tobeuploaded[tobindex][1]=tobeuploaded[tobindex][1]+Math.round(5/tobeuploaded.length)
 						}
 						
@@ -111,14 +111,14 @@ try{
 			for(var u=0;u<serverconnections.length;u++){
 				if(serverconnections[u].tempID==tobeuploaded[tobindex][0]){
 					if(tobeuploaded.length>=5){
-						serverconnections[u]._sendText(Buffer.concat(arrbuffer[tobeuploaded[tobindex][1]]).toString("hex"))
+						serverconnections[u]._sendText(Buffer.concat(arrbuffer[tobeuploaded[tobindex][1]]).toString("binary"))
 						tobeuploaded[tobindex][1]=tobeuploaded[tobindex][1]+1
 					}else{
 						tempslice=arrbuffer.slice(tobeuploaded[tobindex][1],tobeuploaded[tobindex][1]+Math.round(5/tobeuploaded.length))
 						if(tempslice.length===0){
 							tobeuploaded[tobindex][1]=breakup
 						}else{
-							serverconnections[u]._sendText(Buffer.concat(tempslice).toString("hex"))
+							serverconnections[u]._sendText(Buffer.concat(tempslice).toString("binary"))
 							tobeuploaded[tobindex][1]=tobeuploaded[tobindex][1]+Math.round(5/tobeuploaded.length)
 						}
 						
@@ -330,7 +330,7 @@ try{
 							return
 						}
 					}
-					connection.playerip=str1[2]
+					connection.playerip=str1.slice(2).join(":")
 					for(var zz=0;zz<playernames.length;zz++){
 						if(playernames[zz]===name){
 						name=name+(zz+1)
@@ -374,10 +374,14 @@ try{
 				if(numberofplayers>1 && map=="free4all"){
 					begingamefree4all()
 				}
-				if(serverlock===true && map==="default"){
+				if(numberofplayers>1 && map=="zombies" && serverlock===false ){
+					begingamezombies()
+				}
+				if(serverlock===true &&( map==="default" || map==="zombies")){
 					connection.todo.push("roundstarted")
+					broadcast("spawn:"+(connection.playerid+1000)+":"+connection.playername+":m")
 					connection.alive=false
-				}else if(map==="default"){
+				}else if(map==="default" || map==="zombies"){
 					connection.todo.push("message:Waiting for players.\\|\\^")
 				}
 	
@@ -466,10 +470,12 @@ try{
 			else if(str1.indexOf("dead")==0){
 				connection.msgcounter+=5
 				if(str1.split(":")[1]!=connection.playerid) {connection.close();return}
-				createobject(connection.x,connection.y,22)
+				
+				if(connection.alive==true && (map=="default" || map=="Zombies")){
+					broadcast("chat::"+connection.playername+" has died.")
+					createobject(connection.x,connection.y,22)
+				}
 				broadcast(str1)
-				broadcast("chat::"+connection.playername+" has died.")
-	
 				if(map=="default"){
 					playersalive--
 					broadcast("chat::"+playersalive+" players left.")
@@ -502,6 +508,13 @@ try{
 						}
 					},2000,(connection.playerid+1000),connection.playername,connection)
 					
+				}else if(map=="zombies"){
+					
+					
+					broadcast("tpevent:23:49:"+(connection.playerid+1000))
+					broadcast("spawn:"+(connection.playerid+1000)+":"+connection.playername+":m")
+					connection.x=23
+					connection.y=49
 				}
 			}
 			else if(str1.indexOf("through")==0){
@@ -987,10 +1000,11 @@ try{
 		}
 	
 		
-	
+		const possibleX=[12,22,32,41,49,39,43,59,70,61,53,59,69,13,78,9,9,13,4,22,27,27,36,45,40,38,58]
+		const possibleY=[7,5,7,8,14,28,35,42,18,8,58,6,61,64,76,28,35,42,44,44,38,24,44,41,52,62,27]
+		
 		var chestspawner=setInterval(()=>{
-			var possibleX=[12,22,32,41,49,39,43,59,70,61,53,59,69,13,78,9,9,13,4,22,27,27,36,45,40,38,58]
-			var possibleY=[7,5,7,8,14,28,35,42,18,8,58,6,61,64,76,28,35,42,44,44,38,24,44,41,52,62,27]
+			
 
 	
 			var possibleresult=getRandomInt(1,27)
@@ -1030,6 +1044,65 @@ try{
 		broadcast("gamewillbegin")
 		setTimeout(broadcast("begin"),3000)
 	
+	}
+
+	function begingamezombies(){
+		
+		reseting=false
+		objects=[]
+		checkobjs=[]
+		nonmovable=[]
+		broadcast("reset")
+		for(var u=1;u<highestid;u++){
+			broadcast("eventid:"+u)
+			if(playercounter[u]===0){
+				broadcast("dead:"+u)
+			}
+		}
+
+		for(var i=0;i<server.connections.length;i++){
+			server.connections[i].alive=true
+			server.connections[i].killcount=0
+		}
+
+		broadcast("gamewillbegin")
+		
+		setTimeout(()=>{
+			for(var i=server.connections.length;i--;){
+				broadcast("spawn:"+(server.connections[i].playerid+1000)+":"+server.connections[i].playername)
+			}
+			broadcast("begin")
+			serverlock=true
+		},3000)
+
+		checkendgame=setInterval(()=>{
+			if(playersalive<2){
+				for(var i=server.connections.length;i--;){
+					if(server.connections[i].alive==true){
+						broadcast("message:"+server.connections[i].playername+` has won!
+							Kill count:`+server.connections[i].killcount+"\\|\\^")
+						break
+					}
+				}
+				broadcast("message:Game has ended!\\|\\^")
+				reseting=true
+				playersalive=numberofplayers
+				broadcast("reset")
+				for(var u=1;u<=highestid;u++){
+					broadcast("eventid:"+u)
+					if(playercounter[u]===0){
+							broadcast("dead:"+u)
+						}
+				}
+
+				clearInterval(checkendgame)
+				serverlock=false
+				if(numberofplayers>1 && map==="zombies"){
+					begingamezombies()
+				}
+
+			}
+		},1001)
 	}
 	
 	console.log("Server running!")

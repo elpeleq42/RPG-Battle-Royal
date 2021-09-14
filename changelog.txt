@@ -23,13 +23,15 @@ Changes:
 -Added new /w and /whisper chat commands for sending a private message to a player in game.
 -Removed upload limits for throttling the upload
 -Players now drop the items they were carrying when they die.
+-Flashlight's light slightly changed
 
 Optimizations:
--The game's zip file is now 25% smaller.
+-The game's zip file size is now smaller.
 -Messages are better encrypted and encryption/decryption should be 10% faster aswell.
--Many server functions are no longer anonymous, being now properly cached. This should nearly double their performance.
+-Many server functions are no longer anonymous, being now properly cached and optimized. This should nearly double their performance.
 -Several micro optimizations for the client.
 -Amount of messages sent between client and server has been reduced, saving up data and server processing.
+-Client now offloads map extraction to a temporary secondary thread, avoiding lagging the game.
 
 Fixes:
 -Fixed minor collision problems on default map.
@@ -45,3 +47,4 @@ Fixes:
 -Fixed server allowing a player to be teleport to a NaN position, which would result in a blackscreen
 -Fixed issues with sending gold to the player that got a kill in certain occasions
 -Fixed issues related to players not showing up, or names randomly showing up even without a player being there. Hopefully a definitive fix for this issue.
+-Fixed issue where sometimes the player would be teleport back to previous position and then once more to the actual expected position.

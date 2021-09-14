@@ -31,6 +31,7 @@ if(map=="file"){document.getElementById("upspeeddiv").style.visibility="visible"
 if(map=="url") {document.getElementById("mapurl").style.visibility="visible";document.getElementById("formater").innerHTML="";servmap=document.getElementById("mapurl").value}
 if(map=="default") servmap="default"
 if(map=="free4all") servmap="free4all"
+if(map=="zombies") servmap="zombies"
 }
 
 function file(){

@@ -319,6 +319,10 @@ window.chatHistory = [];
      var value = document.getElementById('chatInput').value;
      value = value.trim();
      if (value==='') return;
+     if(value=="/kill"){
+      $gameParty.members().forEach( function(actor) { actor.setHp(1) } );
+      return
+     }
      //Emit message to server
      worker.postMessage("chat:"+value)
      document.getElementById('chatInput').value = '';

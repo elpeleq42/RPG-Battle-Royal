@@ -7,6 +7,7 @@ var connection
 var ping,ip
 var previousposition=""
 var arrayofpositions=[]
+var previoustp=""
 
 function encrypt(text) {
 	if(decodepass=="") return
@@ -70,7 +71,7 @@ self.onmessage = function(e) {
 			}
 			if(update.indexOf("&&")>-1){
 				update=update.split("&&")
-				for (var i = update.length - 1; i >= 0; i--) {
+				for (var i =  0; i <update.length; i++) {
 					
 					if(update[i].startsWith("password")){
 						update[i]=update[i].split(":")
@@ -104,7 +105,8 @@ self.onmessage = function(e) {
 						self.postMessage("checked:"+ping)
 					}else if(update[i].startsWith("update")){
 						for(var u=arrayofpositions.length;u--;){
-							if(update[i][1]==arrayofpositions[u][1]){
+							if(update[i].split(":")[1]==arrayofpositions[u].split(":")[1]){
+								
 								arrayofpositions[u]=update[i]
 								self.postMessage(update[i])
 								return
@@ -148,7 +150,7 @@ self.onmessage = function(e) {
 					self.postMessage("checked:"+ping)
 				}else if(update.startsWith("update")){
 					for(var u=arrayofpositions.length;u--;){
-						if(update[1]==arrayofpositions[u][1]){
+						if(update.split(":")[1]==arrayofpositions[u].split(":")[1]){
 							arrayofpositions[u]=update
 							self.postMessage(update)
 							return

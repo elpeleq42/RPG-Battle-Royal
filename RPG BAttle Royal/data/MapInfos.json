@@ -1,10 +1,10 @@
 [
 null,
-{"id":1,"expanded":true,"name":"defaultMap","order":1,"parentId":0,"scrollX":2604,"scrollY":3316},
-{"id":2,"expanded":false,"name":"spawnmap","order":2,"parentId":0,"scrollX":659,"scrollY":366.5},
-{"id":3,"expanded":false,"name":"servers","order":3,"parentId":0,"scrollX":2636,"scrollY":1484},
-{"id":4,"expanded":false,"name":"testmap","order":4,"parentId":0,"scrollX":2604,"scrollY":2822},
-{"id":5,"expanded":false,"name":"Custom Map","order":5,"parentId":0,"scrollX":2636,"scrollY":1484},
-{"id":6,"expanded":false,"name":"Free for All","order":6,"parentId":0,"scrollX":2604,"scrollY":2212},
-{"id":7,"expanded":false,"name":"Zombies","order":7,"parentId":0,"scrollX":2936.5714285714284,"scrollY":2506.285714285714}
+{"id":1,"expanded":true,"name":"defaultMap","order":1,"parentId":0,"scrollX":2604,"scrollY":3316.7999999999997},
+{"id":2,"expanded":false,"name":"spawnmap","order":2,"parentId":0,"scrollX":1437.818181818182,"scrollY":809.4545454545455},
+{"id":3,"expanded":false,"name":"servers","order":3,"parentId":0,"scrollX":1437.818181818182,"scrollY":809.4545454545455},
+{"id":4,"expanded":false,"name":"testmap","order":4,"parentId":0,"scrollX":2605.090909090909,"scrollY":2341.090909090909},
+{"id":5,"expanded":false,"name":"Custom Map","order":5,"parentId":0,"scrollX":1437.818181818182,"scrollY":809.4545454545455},
+{"id":6,"expanded":false,"name":"Free for All","order":6,"parentId":0,"scrollX":2133.818181818182,"scrollY":2825.4545454545455},
+{"id":7,"expanded":false,"name":"Zombies","order":7,"parentId":0,"scrollX":1420.3636363636365,"scrollY":1898.1818181818182}
 ]
