@@ -413,6 +413,20 @@ SceneManager.resume = function() {
     
 };
 
+////////////////////////////////////////
+
+Game_CharacterBase.prototype.requestAnimation = function(animationId,confirm) {
+    if($gameMap._mapId==5){
+        if(confirm=="true"){
+            this._animationId = animationId;
+        }else{
+            this._animationId = (animationId+11);
+        }
+    }else{
+        this._animationId = animationId;
+    }
+};
+
 
 ///////
 

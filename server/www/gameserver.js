@@ -28,18 +28,18 @@ try{
 	const crypt = require('crypto')
 	const fs   = require('fs')
 	var nonmovable= objects= checkobjs= tobeuploaded= banlist=[]
-	var playercounter= new Uint8Array(1001).fill(0)
+	var playercounter= new Uint8Array(1001)
 	var playernames = new Array(1001).fill("")
 	var serverfull= serverlock=reseting=false
-	var checkendgame,temp,string, disconnectthis
+	var checkendgame,temp,disconnectthis
 	var objectcounter= highestid=playersalive=numberofplayers=giveID=0
 	var timelapse= arrbuffer=undefined
+	var sentries=[]
 	
 	
 	
 	if(map!=="default" && map!=="zombies" && map!=="free4all" && !(map.indexOf("http")==0)){
-		var file = process.argv[2],
-		map = fs.readFileSync(servmap);
+		var map = fs.readFileSync(servmap);
 		if(upspeedmap!=0){
 	
 
@@ -50,7 +50,6 @@ try{
 			for(var i=breakup;i--;){
 				arrbuffer[i]=Buffer.allocUnsafe(forsize)
 				map.copy(arrbuffer[i],0,i*forsize,(i+1)*forsize)
-				arrbuffer[i]=arrbuffer[i]
 			}
 			map="filecustom"
 	
@@ -91,6 +90,7 @@ try{
 
 						tobeuploaded.splice(tobindex,1);
 						serverconnections[u]._sendText("finished");
+						serverconnections[u].tempID=null
 						serverconnections[u].close()
 					}
 					if(tobeuploaded.length>0){ 
@@ -127,6 +127,7 @@ try{
 					if(tobeuploaded[tobindex][1]==breakup){
 						tobeuploaded.splice(tobindex,1);
 						serverconnections[u]._sendText("finished");
+						serverconnections[u].tempID=null
 						serverconnections[u].close()
 					}
 					if(tobeuploaded.length>0){ 
@@ -374,7 +375,7 @@ try{
 				if(numberofplayers>1 && map=="free4all"){
 					begingamefree4all()
 				}
-				if(numberofplayers>1 && map=="zombies" && serverlock===false ){
+				if(numberofplayers>2 && map=="zombies" && serverlock===false ){
 					begingamezombies()
 				}
 				if(serverlock===true &&( map==="default" || map==="zombies")){
@@ -394,23 +395,37 @@ try{
 			else if(str1.indexOf("build")==0){
 				connection.msgcounter+=5
 				str1=str1.split(":")
+				console.log(str1)
 				if(str1[1]==1){
 					broadcast("build:"+connection.x+':'+(Number(connection.y)+1)+":"+str1[2]+":"+objectcounter+":"+str1[3]+":"+str1[4])
 						objects[objectcounter]=objectcounter+":"+connection.x+":"+(Number(connection.y)+1)+":"+str1[2]+":"+str1[3]+":"+str1[4]
+						if(str1[3]=="sentry"){
+							sentries.push([objectcounter,Number(connection.x),(Number(connection.y)+1),connection.playerid])
+						}
 						objectcounter++
 				}else if(str1[1]==2){
 					broadcast("build:"+(Number(connection.x)-1)+':'+connection.y+":"+str1[2]+":"+objectcounter+":"+str1[3]+":"+str1[4])
 						objects[objectcounter]=objectcounter+":"+(Number(connection.x)-1)+":"+connection.y+":"+str1[2]+":"+str1[3]+":"+str1[4]
+						if(str1[3]=="sentry"){
+							sentries.push([objectcounter,(Number(connection.x)-1),Number(connection.y),connection.playerid])
+						}
 						objectcounter++
 				}else if(str1[1]==3){
 					broadcast("build:"+(Number(connection.x)+1)+':'+connection.y+":"+str1[2]+":"+objectcounter+":"+str1[3]+":"+str1[4])
 						objects[objectcounter]=objectcounter+":"+(Number(connection.x)+1)+":"+connection.y+":"+str1[2]+":"+str1[3]+":"+str1[4]
+						if(str1[3]=="sentry"){
+							sentries.push([objectcounter,(Number(connection.x)+1),Number(connection.y),connection.playerid])
+						}
 						objectcounter++
 				}else if(str1[1]==4){
 					broadcast("build:"+connection.x+':'+(Number(connection.y)-1)+":"+str1[2]+":"+objectcounter+":"+str1[3]+":"+str1[4])
 						objects[objectcounter]=objectcounter+":"+connection.x+":"+(Number(connection.y)-1)+":"+str1[2]+":"+str1[3]+":"+str1[4]
+						if(str1[3]=="sentry"){
+							sentries.push([objectcounter,Number(connection.x),(Number(connection.y)-1),connection.playerid])
+						}
 						objectcounter++
 				}
+				
 			}
 			else if(str1.indexOf("tpevent")==0){
 				if(str1.split(":")[1]=='NaN' || str1.split(":")[2]=='NaN') return
@@ -456,6 +471,12 @@ try{
 								break
 							}
 						}
+						for(var u=0;u<sentries.length;u++){
+							if(sentries[u][0]==str1.split(":")[1]) {
+								sentries.splice(u,1)
+								break
+							}
+						}
 						break;
 					}	
 				}
@@ -471,7 +492,7 @@ try{
 				connection.msgcounter+=5
 				if(str1.split(":")[1]!=connection.playerid) {connection.close();return}
 				
-				if(connection.alive==true && (map=="default" || map=="Zombies")){
+				if(connection.alive==true){
 					broadcast("chat::"+connection.playername+" has died.")
 					createobject(connection.x,connection.y,22)
 				}
@@ -513,6 +534,10 @@ try{
 					
 					broadcast("tpevent:23:49:"+(connection.playerid+1000))
 					broadcast("spawn:"+(connection.playerid+1000)+":"+connection.playername+":m")
+					if(connection.alive==true){
+						playersalive--
+					}
+					connection.alive=false
 					connection.x=23
 					connection.y=49
 				}
@@ -791,9 +816,16 @@ try{
 	}
 	
 	setInterval(()=>{
-		for (var i = server.connections.length - 1; i >= 0; i--) {
+		for (var i =0 ; i <  server.connections.length ; i++) {
 			server.connections[i].msgcounter=0
 		}
+		for(var i=0; i<sentries.length;i++){
+			broadcast("arrow:"+sentries[i][1]+":"+(sentries[i][2])+":"+sentries[i][3]+":1")
+			broadcast("arrow:"+(sentries[i][1])+":"+sentries[i][2]+":"+sentries[i][3]+":2")
+			broadcast("arrow:"+(sentries[i][1])+":"+sentries[i][2]+":"+sentries[i][3]+":3")
+			broadcast("arrow:"+sentries[i][1]+":"+(sentries[i][2])+":"+sentries[i][3]+":4")
+		}
+
 	},1000)
 	
 	
@@ -858,6 +890,7 @@ try{
 	},250)
 	
 	begingame=function(){
+		
 		reseting=false
 		if(timelapse==undefined){
 			var light=100
@@ -875,6 +908,7 @@ try{
 		objects=[]
 		checkobjs=[]
 		nonmovable=[]
+		sentries=[]
 		for(var i=0;i<server.connections.length;i++){
 			server.connections[i].alive=true
 			server.connections[i].killcount=0
@@ -1022,6 +1056,7 @@ try{
 		objects=[]
 		checkobjs=[]
 		nonmovable=[]
+		sentries=[]
 		for(var i=0;i<server.connections.length;i++){
 			server.connections[i].alive=true
 			server.connections[i].killcount=0
@@ -1031,6 +1066,24 @@ try{
 			clearInterval(checkendgame)
 			clearInterval(chestspawner)
 		}
+
+		var checkendgame=setInterval(()=>{
+
+			if(numberofplayers<2){
+				objects=[]
+				sentries=[]
+				nonmovable=[]
+				checkobjs=[]
+				for(var i=0;i<server.connections.length;i++){
+					server.connections[i].alive=true
+					server.connections[i].killcount=0
+				}
+				broadcast("reset")
+				clearInterval(checkendgame)
+				clearInterval(chestspawner)
+			}
+
+		},1000)
 	
 	
 	
@@ -1052,6 +1105,7 @@ try{
 		objects=[]
 		checkobjs=[]
 		nonmovable=[]
+		sentries=[]
 		broadcast("reset")
 		for(var u=1;u<highestid;u++){
 			broadcast("eventid:"+u)
@@ -1068,10 +1122,23 @@ try{
 		broadcast("gamewillbegin")
 		
 		setTimeout(()=>{
-			for(var i=server.connections.length;i--;){
-				broadcast("spawn:"+(server.connections[i].playerid+1000)+":"+server.connections[i].playername)
+		
+			var randomplayerid=(Math.floor(Math.random() * (numberofplayers+1))+1001)
+			
+			for(var i=0;i<server.connections.length;i++){
+				if(server.connections[i].playerid!=(randomplayerid-1000)){
+					broadcast("spawn:"+(server.connections[i].playerid+1000)+":"+server.connections[i].playername)
+					
+					
+				}else{
+					server.connections[i].alive=false
+				}
 			}
+			
+			
+
 			broadcast("begin")
+			broadcast('dead:'+(randomplayerid-1000))
 			serverlock=true
 		},3000)
 

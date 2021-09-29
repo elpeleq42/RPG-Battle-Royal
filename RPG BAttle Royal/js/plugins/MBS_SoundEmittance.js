@@ -194,6 +194,7 @@ MBS.SoundEmittance = {};
 	}
 
 	Game_SoundEmittance.prototype.initialize = function(filename) {
+		if (this._erased==true) return
 		this.filename = filename;
 		this.volume = 0.9;
 		this.pitch = 1;
@@ -239,18 +240,18 @@ MBS.SoundEmittance = {};
 		var list = this.list();
 
 		var comments = "";
-		list.forEach(function (command) {
-			if (command.code == 108 || command.code == 408) {
-				comments += command.parameters[0] + "\n";
+		for (let i = 0; i < list.length; i++) {
+			if (list[i].code == 108 || list[i].code == 408) {
+				comments += list[i].parameters[0] + "\n";
 			}
-		});
-
+			
+		}
 		var filename = (/\s*<\s*s_emittance\s*:\s*(.+)\s*>\s*/i.exec(comments) || [])[1];
 		if (filename != undefined)
 			this._sEmittance = new Game_SoundEmittance(audioFilename(AudioManager._path + filename));
 
 		var radius = (/\s*<\s*s_e_radius\s*:\s*(\d+(\.\d+)?)\s*>\s*/i.exec(comments) || [])[1];
-		this._sEmittanceRadius = radius || 1;
+		this._sEmittanceRadius = radius || 12;
 
 		var volume = (/\s*<\s*s_e_volume\s*:\s*(\d+)\s*>\s*/i.exec(comments) || [])[1];
 		if (volume && this._sEmittance)
@@ -265,7 +266,7 @@ MBS.SoundEmittance = {};
 	// > Added call to sound emittance update
 	Game_Event.prototype.update = function() {
 	    Game_Event_update_old.apply(this, arguments);
-	    this.updateSEmittance();
+	    if(this._erased==false) this.updateSEmittance();
 	};
 
 	// Updates the sound emittance as needed
@@ -273,7 +274,7 @@ MBS.SoundEmittance = {};
 		if (this._sEmittance) {
 			if (!this._sEmittance.playing) {
 				this._sEmittance.play(true, 0);
-				this._sEmittance.maxDistance = this._sEmittanceRadius || 1;
+				this._sEmittance.maxDistance = this._sEmittanceRadius || 12;
 			}
 			this._sEmittance.position = [this._realX - $gamePlayer._realX, this._realY - $gamePlayer._realY];
 		}
@@ -281,7 +282,7 @@ MBS.SoundEmittance = {};
 
 	Game_Event.prototype.refresh = function() {
 		Game_Event_refresh_old.apply(this, arguments);
-		this.refreshSEmittance();
+		if(this._erased==false) this.refreshSEmittance();
 	}
 
 	// Adds the sound emittance to the playing list
@@ -312,9 +313,9 @@ MBS.SoundEmittance = {};
 	var Game_Map_setupEvents = Game_Map.prototype.setupEvents;
 
 	Game_Map.prototype.setupEvents = function() {
-		$_soundEmittances.forEach(function(e) {
-			e.stop();
-		});
+		for (let i = 0; i < $_soundEmittances.length; i++) {
+			$_soundEmittances[i].stop();
+		}
 		$_soundEmittances = [];
 	    Game_Map_setupEvents.apply(this, arguments);
 	};
@@ -328,26 +329,27 @@ MBS.SoundEmittance = {};
 
 	Scene_Map.prototype.update = function() {
 		Scene_Map_update.apply(this, arguments);
-		$_soundEmittances.forEach(function(emittance) {
+		for (let i = 0; i < $_soundEmittances.length; i++) {
+			
 			if ($.Param.use3D) 
-				emittance.position = emittance._evEmittance.position;
+				$_soundEmittances[i].position = $_soundEmittances[i]._evEmittance.position;
 			else 
 			{
-				var dx = emittance._evEmittance.position[0], 
-					dy = emittance._evEmittance.position[1];
+				var dx = $_soundEmittances[i]._evEmittance.position[0], 
+					dy = $_soundEmittances[i]._evEmittance.position[1];
 				var distance = Math.sqrt(dx*dx + dy*dy);
-				emittance.volume = emittance._evEmittance.volume * (emittance._evEmittance.maxDistance - distance) / emittance._evEmittance.maxDistance;
+				$_soundEmittances[i].volume = $_soundEmittances[i]._evEmittance.volume * ($_soundEmittances[i]._evEmittance.maxDistance - distance) / $_soundEmittances[i]._evEmittance.maxDistance;
 			}
-			if (emittance.isPlaying()) {
-				if (!emittance._evEmittance.playing) {
-					emittance.stop();
-					$_soundEmittances.splice($_soundEmittances.indexOf(emittance), 1);
+			if ($_soundEmittances[i].isPlaying()) {
+				if (!$_soundEmittances[i]._evEmittance.playing) {
+					$_soundEmittances[i].stop();
+					$_soundEmittances.splice($_soundEmittances.indexOf($_soundEmittances[i]), 1);
 				}
-			} else if (emittance && emittance.isReady()) {
-				emittance.play.apply(emittance, emittance._evEmittance.playParameters);
-				emittance._pannerNode.maxDistance = emittance._evEmittance.maxDistance;
+			} else if ($_soundEmittances[i] && $_soundEmittances[i].isReady()) {
+				$_soundEmittances[i].play.apply($_soundEmittances[i], $_soundEmittances[i]._evEmittance.playParameters);
+				$_soundEmittances[i]._pannerNode.maxDistance = $_soundEmittances[i]._evEmittance.maxDistance;
 			}
-		});
+		}
 	}
 
 	Scene_Map.prototype.start = function() {
@@ -357,9 +359,9 @@ MBS.SoundEmittance = {};
 
 	Scene_Map.prototype.terminate = function() {
 		Scene_Map_terminate.apply(this, arguments);
-		$_soundEmittances.forEach(function(emittance) {
-			emittance.stop();
-		});
+		for(var i=0; i<$_soundEmittances.length;i++){
+			$_soundEmittances[i].stop()
+		}
 		$_soundEmittances = [];
 	}
 

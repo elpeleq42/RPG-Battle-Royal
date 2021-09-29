@@ -1,7 +1,8 @@
 Changes:
 -New server tick system(default being 30, max 1000).
 -New max afk time setting for servers.
--New map and game mode: Free for All.
+-Two new maps and game modes: Free for All and Zombies.
+-New building: Sentry. It shoots arrows on 4 directions.
 -Default BR Map slightly tweaked
 -Server script updated to be easier for custom scripting. Now you can make a new file called "custom.js", place it in the same folder as the server scripts and add custom scripts to your server on it! The server by default will respond to 4 main functions called on_start(runs when the server starts), on_tick(runs on every server tick), on_message(runs every time the server receives any message, receiving "msg" and "connection" as input), on_close(runs whenever a connection closes, receives "connection" and "message" as parameter, the later being useful for error detection), but you can write code outside those aswell.
 -Both Default map and the free for all contain coconuts in the ground that restore health.
@@ -48,3 +49,5 @@ Fixes:
 -Fixed issues with sending gold to the player that got a kill in certain occasions
 -Fixed issues related to players not showing up, or names randomly showing up even without a player being there. Hopefully a definitive fix for this issue.
 -Fixed issue where sometimes the player would be teleport back to previous position and then once more to the actual expected position.
+-Fixed custom maps overriding the original animations
+-Fixed bug that would cause erased events to continue updating their sound emittance, causing frame drops

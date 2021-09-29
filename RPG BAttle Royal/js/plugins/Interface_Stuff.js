@@ -400,13 +400,14 @@ previousgamex=undefined
 previousgamey=undefined
 var playerxonmini,playeryonmini
 
-
-function intervalchecker(){
-
-  if(previousgamex==undefined){
+if(previousgamex==undefined){
   previousgamex=1280
   previousgamey=720
   }
+
+function intervalchecker(){
+
+  
   
   document.getElementById("playerindicator").style.right=((Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*-9/10)+(100-$gamePlayer._x*96/Math.floor($dataMap.width*48/100)))+"px"
   document.getElementById("playerindicator").style.top=((Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*-84/100)-(100-$gamePlayer._y*96/Math.floor($dataMap.height*48/100)))+"px"
