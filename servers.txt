@@ -1,2 +1,4 @@
 BattleRoyal US - ws://rpgbattleroyal.herokuapp.com
+Free4All US - ws://rpgbattleroyalfree4all.herokuapp.com
+Zombies US - ws://rpgbattleroyalzombie.herokuapp.com
 local - ws://localhost:1000
