@@ -1,2 +1,2 @@
+Main US 1 - ws://rpgbattleroyal.herokuapp.com
 default - ws://localhost:1000
-Main 1 - ws://rpgbattleroyal.herokuapp.com
