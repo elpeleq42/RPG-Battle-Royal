@@ -1,2 +1,2 @@
 BattleRoyal US - ws://rpgbattleroyal.herokuapp.com
-default - ws://localhost:1000
+local - ws://localhost:1000
