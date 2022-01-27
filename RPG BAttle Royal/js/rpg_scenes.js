@@ -257,11 +257,12 @@ Scene_Base.prototype.updateFade = function() {
  * @memberof Scene_Base
  */
 Scene_Base.prototype.updateChildren = function() {
-    this.children.forEach(function(child) {
-        if (child.update) {
-            child.update();
+    var allchildren=this.children
+    for(var i=0;i<allchildren.length;i++){
+        if (allchildren[i].update) {
+            allchildren[i].update();
         }
-    });
+    }
 };
 
 /**

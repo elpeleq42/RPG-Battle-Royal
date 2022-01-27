@@ -225,6 +225,7 @@ Yanfly.Footsteps.version = 1.01;
 // Parameter Variables
 //=============================================================================
 
+$footsteplimit=0
 Yanfly.Parameters = PluginManager.parameters('YEP_FootstepSounds');
 Yanfly.Param = Yanfly.Param || {};
 
@@ -397,7 +398,8 @@ Game_CharacterBase.prototype.canPlayFootsteps = function() {
 };
 
 Game_CharacterBase.prototype.processFootstepSound = function() {
-  if (this.canPlayFootsteps() && $gameSystem.canHearFootsteps()) {
+  if (this.canPlayFootsteps() && $gameSystem.canHearFootsteps() && $footsteplimit<10) {
+    $footsteplimit++
     var player = $gamePlayer;
     var distance = $gameMap.distance(this.x, this.y, player.x, player.y);
     var volume = Yanfly.Param.Footsteps.EventVolume || 0;
@@ -407,6 +409,7 @@ Game_CharacterBase.prototype.processFootstepSound = function() {
     var pan = 0;
     pan -= $gameMap.deltaX(this.x, player.x);
     this.playFootstepSound(volume, pitch, pan);
+    setTimeout($decreasefootsteplimit, 200);
   };
 };
 
@@ -443,7 +446,12 @@ Game_CharacterBase.prototype.playFootstepSound = function(volume, pitch, pan) {
     pan:    pan.clamp(-100, 100)
   };
   AudioManager.playSe(se);
+  
 };
+
+$decreasefootsteplimit=function(){
+  $footsteplimit--
+}
 
 //=============================================================================
 // Game_Player

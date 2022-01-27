@@ -2582,7 +2582,7 @@ Graphics._createRenderer = function() {
     PIXI.dontSayHello = true;
     var width = this._width;
     var height = this._height;
-    var options = { view: this._canvas };
+    var options = { view: this._canvas};
     try {
         switch (this._rendererType) {
         case 'canvas':
@@ -4070,11 +4070,11 @@ Object.defineProperty(Sprite.prototype, 'opacity', {
  * @method update
  */
 Sprite.prototype.update = function() {
-    this.children.forEach(function(child) {
-        if (child.update) {
-            child.update();
+    for(var i=0;i<this.children.length;i++){
+        if(this.children[i].update){
+            this.children[i].update()
         }
-    });
+    }
 };
 
 /**
@@ -4710,11 +4710,11 @@ Tilemap.prototype.isReady = function() {
 Tilemap.prototype.update = function() {
     this.animationCount++;
     this.animationFrame = Math.floor(this.animationCount / 30);
-    this.children.forEach(function(child) {
-        if (child.update) {
-            child.update();
+    for(var i=0;i<this.children.length;i++){
+        if(this.children[i].update){
+            this.children[i].update()
         }
-    });
+    }
     for (var i=0; i<this.bitmaps.length;i++) {
         if (this.bitmaps[i]) {
             this.bitmaps[i].touch();
@@ -5256,6 +5256,13 @@ Tilemap.prototype._isOverpassPosition = function(mx, my) {
  * @private
  */
 Tilemap.prototype._sortChildren = function() {
+    var currentchildren
+    for(var i=this.children.length-1;i--;){
+        currentchildren=this.children[i]._character
+        if(currentchildren && currentchildren._erased==true && currentchildren._animationPlaying==false) {
+            this.children.splice(i,1)
+        }
+    }
     this.children.sort(this._compareChildOrder.bind(this));
 };
 
@@ -6017,11 +6024,11 @@ Object.defineProperty(TilingSprite.prototype, 'opacity', {
  * @method update
  */
 TilingSprite.prototype.update = function() {
-    this.children.forEach(function(child) {
-        if (child.update) {
-            child.update();
+    for(var i=0;i<this.children.length;i++){
+        if(this.children[i].update){
+            this.children[i].update()
         }
-    });
+    }
 };
 
 /**
@@ -6515,11 +6522,11 @@ Window.prototype.update = function() {
     if (this.active) {
         this._animationCount++;
     }
-    this.children.forEach(function(child) {
-        if (child.update) {
-            child.update();
+    for(var i=0;i<this.children.length;i++){
+        if(this.children[i].update){
+            this.children[i].update()
         }
-    });
+    }
 };
 
 /**
@@ -7037,11 +7044,11 @@ WindowLayer.prototype.move = function(x, y, width, height) {
  * @method update
  */
 WindowLayer.prototype.update = function() {
-    this.children.forEach(function(child) {
-        if (child.update) {
-            child.update();
+    for(var i=0;i<this.children.length;i++){
+        if(this.children[i].update){
+            this.children[i].update()
         }
-    });
+    }
 };
 
 /**

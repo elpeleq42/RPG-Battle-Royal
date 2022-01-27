@@ -1384,11 +1384,13 @@ Sprite_Animation.prototype.updateFrame = function() {
     if (this._duration > 0) {
         var frameIndex = this.currentFrameIndex();
         this.updateAllCellSprites(this._animation.frames[frameIndex]);
-        this._animation.timings.forEach(function(timing) {
-            if (timing.frame === frameIndex) {
-                this.processTimingData(timing);
+        var values=this._animation.timings
+        for(var i=values.length;i--;){
+            if (values[i].frame === frameIndex) {
+                this.processTimingData(values[i]);
             }
-        }, this);
+        }
+        
     }
 };
 
@@ -2328,9 +2330,10 @@ Spriteset_Map.prototype.loadTileset = function() {
 
 Spriteset_Map.prototype.createCharacters = function() {
     this._characterSprites = [];
-    $gameMap.events().forEach(function(event) {
-        this._characterSprites.push(new Sprite_Character(event));
-    }, this);
+    var allevents=$gameMap.events()
+    for(var i=0;i<allevents.length;i++){
+        this._characterSprites.push(new Sprite_Character(allevents[i]));
+    }
     $gameMap.vehicles().forEach(function(vehicle) {
         this._characterSprites.push(new Sprite_Character(vehicle));
     }, this);

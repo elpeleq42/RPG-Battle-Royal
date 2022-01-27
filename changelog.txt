@@ -1,53 +1,21 @@
 Changes:
--New server tick system(default being 30, max 1000).
--New max afk time setting for servers.
--Two new maps and game modes: Free for All and Zombies.
--New building: Sentry. It shoots arrows on 4 directions.
--Default BR Map slightly tweaked
--Server script updated to be easier for custom scripting. Now you can make a new file called "custom.js", place it in the same folder as the server scripts and add custom scripts to your server on it! The server by default will respond to 4 main functions called on_start(runs when the server starts), on_tick(runs on every server tick), on_message(runs every time the server receives any message, receiving "msg" and "connection" as input), on_close(runs whenever a connection closes, receives "connection" and "message" as parameter, the later being useful for error detection), but you can write code outside those aswell.
--Both Default map and the free for all contain coconuts in the ground that restore health.
--New Melee weapon: Sword.
--New script files to run the server using purely node.js
--New indication to where the buildings are going to spawn when using the building tool.
--Added TTS Chat option.
--The player and event(in custom map) limit per server has been raised from 100 to 1000(Thanks to all performance optimizations on both client and server).
--New animations and sound effects added.
--New UI that shows kills, name and ID(default key: TAB).
--Client now shows how fast you're downloading a custom map.
--Now if the player isn't running, they won't make footstep noises anymore.
--Minimap now displays a red dot indicating player position on the map.
--Removed the patreon button.
--New auto updater added to the main menu.
--Player also changes skin randomly when they join a server.
--When a player dies, the screen now turns grey for them and there will blood where they were to indicate someone died in that spot. The server now also announces when a player dies and, depending on game mode, it will announce the amount of players left(both in chat).
--Added emojis to chat
--Added new /w and /whisper chat commands for sending a private message to a player in game.
--Removed upload limits for throttling the upload
--Players now drop the items they were carrying when they die.
--Flashlight's light slightly changed
+-Screen now flashes red when the player takes damage.
+-New Offline option.
+-New Tower deffense map(for offline).
+-New Twitch Map(for Offline).
+-New Custom Offline Map load option added under the "Offline" menu.
+-New Musics and sound effects added
+-New CRT Mode option added to the settings.
+-New Server List Menu.
+-Graphics updated.
+-NW.js updated.
 
 Optimizations:
--The game's zip file size is now smaller.
--Messages are better encrypted and encryption/decryption should be 10% faster aswell.
--Many server functions are no longer anonymous, being now properly cached and optimized. This should nearly double their performance.
--Several micro optimizations for the client.
--Amount of messages sent between client and server has been reduced, saving up data and server processing.
--Client now offloads map extraction to a temporary secondary thread, avoiding lagging the game.
+-Multiple Microoptimizations to core scripts on the client and HUD.
+-Microoptimizations on the server script.
 
 Fixes:
--Fixed minor collision problems on default map.
--Fixed some problems with the bots A.I.
--Fixed Portals on the default map not respawning on match reset.
--Fixed instances where if the player reached exactly 0 HP, they would get knockout status, not allowing the HP to be recovered and making them an eternal ghost.
--Fixed bug where trying to damage an enemy behind a broken wall block would make the client freeze.
--Fixed visual bug where using teleports would "reset" MP and HP bars.
--Fixed bug where sometimes a player would be desynchronized to other people.
--Fixed small typo in visual interface for the server script.
--Fixed issues with downloading custom maps.
--Fixed issue where you would drop the chest if pressed the drop key while chat is open.
--Fixed server allowing a player to be teleport to a NaN position, which would result in a blackscreen
--Fixed issues with sending gold to the player that got a kill in certain occasions
--Fixed issues related to players not showing up, or names randomly showing up even without a player being there. Hopefully a definitive fix for this issue.
--Fixed issue where sometimes the player would be teleport back to previous position and then once more to the actual expected position.
--Fixed custom maps overriding the original animations
--Fixed bug that would cause erased events to continue updating their sound emittance, causing frame drops
+-Fixed audio issue that would occur when too many footsteps were playing at once(now limited to 50/s).
+-Fixed a memory leak, caused by event spawned not having its sprites properly removed from memory.
+-Fixed gold being visually set to 0 upon transfer.
+-Fixed issue where certain menu options weren't being saved properly.

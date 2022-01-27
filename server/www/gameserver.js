@@ -9,11 +9,11 @@ try{
 	
 	//Server configs://////////////////////////////////
 	const maxnumberofplayers=mxplayers || 100		// Up to 1000
-	const admpassword=adminpassword || undefined   //
+	const admpassword=adminpassword || null   //
 	const serverPort=servportnumb || 1000  		  //
 	const initialgold=initgold || 0    			 //
 	const upspeedmap=upspeed || 0	  			//
-	var serverpass=servpass || undefined	   //
+	var serverpass=servpass || null	   //
 	var map=servmap	|| "default"			  // default, free4all, a link or full file path
 	const tickrate=30            			 // Between 1 and 1000
 	const maxafktime=120                    // Above 0, in seconds
@@ -30,15 +30,15 @@ try{
 	var nonmovable= objects= checkobjs= tobeuploaded= banlist=[]
 	var playercounter= new Uint8Array(1001)
 	var playernames = new Array(1001).fill("")
-	var serverfull= serverlock=reseting=false
+	var serverlock=reseting=false
 	var checkendgame,temp,disconnectthis
 	var objectcounter= highestid=playersalive=numberofplayers=giveID=0
-	var timelapse= arrbuffer=undefined
+	var timelapse= arrbuffer=null
 	var sentries=[]
 	
 	
 	
-	if(map!=="default" && map!=="zombies" && map!=="free4all" && !(map.indexOf("http")==0)){
+	if(map!=="default" && map!=="zombies" && map!=="free4all" && !(map.startsWith("http"))){
 		var map = fs.readFileSync(servmap);
 		if(upspeedmap!=0){
 	
@@ -156,11 +156,12 @@ try{
 		
 		function worker_handler_func(e){
 			var msg=e.data
-			if(msg.indexOf("movemob")==0){
+			if(msg.startsWith("movemob")){
 				if(reseting==true) return
 				broadcast(msg)
-			}else if(msg.indexOf("updateobjects")==0){
+			}else if(msg.startsWith("updateobjects")){
 				if(reseting==true) return
+				
 				msg=msg.split(":");msg.shift();
 				for (var i = objects.length - 1; i >= 0; i--) {
 					if(objects[i] && objects[i].split(":")[0]==msg[0]){
@@ -168,10 +169,13 @@ try{
 						break
 					}
 				}
-			}else if(msg.indexOf("updatecheckobjs")==0){
+			}else if(msg.startsWith("updatecheckobjs")){
 				if(reseting==true) return
-				msg=msg.split(":");msg.shift();msg=msg.join(":").split(",");msg=msg.filter(item=>item)
+				
+				msg=msg.split(":");msg.shift();msg=msg.join(":").split(",");
+				msg=[...new Set(msg)]
 				if(msg.length>0) checkobjs=msg
+				checkobjs=[...new Set(checkobjs)]
 	
 			}else{
 				msg=msg.split(":")
@@ -198,6 +202,7 @@ try{
 		}
 		function cancel_binary(){
 			connection.close()
+			return
 		}
 		connection.on("binary", cancel_binary)
 	
@@ -221,7 +226,7 @@ try{
 		connection.todo=[]
 		connection.afkcount=0
 		connection.killcount=0
-		if(serverpass!==undefined){
+		if(serverpass!==null){
 			connection.sentpass=false
 		}
 	
@@ -250,7 +255,7 @@ try{
 			}
 			
 			else if(str==="ping"){
-				if(serverpass!==undefined){
+				if(serverpass!==null){
 					connection._sendText("totalplayers:"+numberofplayers+"/"+maxnumberofplayers+":locked")
 				}else{
 					connection._sendText("totalplayers:"+numberofplayers+"/"+maxnumberofplayers)
@@ -264,7 +269,7 @@ try{
 					return
 				}
 	
-				if(arrbuffer!=undefined){
+				if(arrbuffer!=null){
 					connection.tempID=getRandomInt(0,9999999)
 					tobeuploaded.push([connection.tempID,0])
 
@@ -279,7 +284,7 @@ try{
 				 
 				
 			}else if(str==serverpass){
-				if(arrbuffer!=undefined){
+				if(arrbuffer!=null){
 					connection.tempID=getRandomInt(0,9999999)
 					tobeuploaded.push([connection.tempID,0])
 
@@ -295,7 +300,7 @@ try{
 	
 	
 			else if (connection.playerid === null && numberofplayers<maxnumberofplayers) {
-				if(!(str1.indexOf("pass")==0) ||( (str1.split(":").length<2 && serverpass!==undefined) || (str1.split(":")[2]!=serverpass && serverpass!==undefined))){
+				if(!(str1.startsWith("pass")) ||( (str1.split(":").length<2 && serverpass!==null) || (str1.split(":")[2]!=serverpass && serverpass!==null))){
 					connection.close()
 					return
 				}
@@ -318,7 +323,7 @@ try{
 				}
 				connection.playerid = giveID
 				
-			}else if(str1.indexOf("name")==0 ){
+			}else if(str1.startsWith("name") ){
 				if(connection.playername!=null){
 					connection.msgcounter+=5
 					return
@@ -387,15 +392,14 @@ try{
 				}
 	
 			}
-			else if(str1.indexOf("arrow")==0){
+			else if(str1.startsWith("arrow")){
 				var str2=str1.split(":")
 				if(Math.abs(str2[1]-connection.x)>2 || Math.abs(str2[2]-connection.y)>2) {connection.close();return}
 				broadcast(str1)
 			}
-			else if(str1.indexOf("build")==0){
+			else if(str1.startsWith("build")){
 				connection.msgcounter+=5
 				str1=str1.split(":")
-				console.log(str1)
 				if(str1[1]==1){
 					broadcast("build:"+connection.x+':'+(Number(connection.y)+1)+":"+str1[2]+":"+objectcounter+":"+str1[3]+":"+str1[4])
 						objects[objectcounter]=objectcounter+":"+connection.x+":"+(Number(connection.y)+1)+":"+str1[2]+":"+str1[3]+":"+str1[4]
@@ -427,36 +431,36 @@ try{
 				}
 				
 			}
-			else if(str1.indexOf("tpevent")==0){
+			else if(str1.startsWith("tpevent")){
 				if(str1.split(":")[1]=='NaN' || str1.split(":")[2]=='NaN') return
 				connection.msgcounter+=5
 				broadcast(str1)
 				connection.x=str1.split(":")[1]
 				connection.y=str1.split(":")[2]
 			}
-			else if(str1.indexOf("animation")==0 || str1.indexOf("rotation")==0 || str1.indexOf("selfswitch")==0 || str1.indexOf("opened")==0){
+			else if(str1.startsWith("animation") || str1.startsWith("rotation") || str1.startsWith("selfswitch") || str1.startsWith("opened")){
 				broadcast(str1)
 			}
 	
-			else if(str1.indexOf("magic")==0){
+			else if(str1.startsWith("magic")){
 				connection.msgcounter+=5
 				var str2=str1.split(":")
 				if(Math.abs(str2[1]-connection.x)>2 || Math.abs(str2[2]-connection.y)>2) {connection.close();return}
 				broadcast(str1)
 			}
-			else if(str1.indexOf("chest")==0){
+			else if(str1.startsWith("chest")){
 				connection.msgcounter+=5
 				broadcast(str1+":"+objectcounter)
 				str11=str1.split(":")
 				objects[objectcounter]=objectcounter+":"+str11[2]+":"+str11[3]+":"+str11[1]
 				objectcounter++
 			}
-			else if(str1.indexOf("flashlight")==0){
+			else if(str1.startsWith("flashlight")){
 				if((connection.playerid+1000)!=str1.split(":")[1]){connection.close();return}
 				broadcast(str1)
 			}
 	
-			else if(str1.indexOf("destroy")==0){
+			else if(str1.startsWith("destroy")){
 				connection.msgcounter+=5
 				objects=objects.filter(Boolean)
 				for(var i=objects.length;i--;){
@@ -482,13 +486,13 @@ try{
 				}
 	
 			}
-			else if(str1.indexOf("damage")==0){
+			else if(str1.startsWith("damage")){
 				connection.msgcounter+=5
 				var str2=str1.split(":")
 				if(Math.abs(str2[2]-connection.x)>2 || Math.abs(str2[3]-connection.y)>2) {connection.close();return}
 				broadcast(str1)
 			}
-			else if(str1.indexOf("dead")==0){
+			else if(str1.startsWith("dead")){
 				connection.msgcounter+=5
 				if(str1.split(":")[1]!=connection.playerid) {connection.close();return}
 				
@@ -542,10 +546,10 @@ try{
 					connection.y=49
 				}
 			}
-			else if(str1.indexOf("through")==0){
+			else if(str1.startsWith("through")){
 				broadcast(str1)
 			}
-			else if(str1.indexOf("sendgold")==0){
+			else if(str1.startsWith("sendgold")){
 				var idtosend=str1.split(":")
 				idtosend=Number(idtosend[1])-1000
 				for(var i=0;i<server.connections.length;i++){
@@ -566,21 +570,20 @@ try{
 				}
 				
 			}
-			else if(str1.indexOf("confirmed")==0){
+			else if(str1.startsWith("confirmed")){
 				if(reseting==true) return
 				str1=str1.split(":")
 	
-				for (var i = checkobjs.length - 1; i >= 0; i--) {
+				for (var i = checkobjs.length ; i--;) {
 					var tempobj1=checkobjs[i].split(":")
 	
 					if(tempobj1[2]==str1[1] && tempobj1[3]==str1[2] && tempobj1[4]==str1[3]){
 						tempobj1[0]=Number(tempobj1[0])+1
 						if(tempobj1[0]==3 || tempobj1[0]>=Math.round(numberofplayers/2)){
-							for (var o = objects.length - 1; o >= 0; o--) {
+							for (var o = objects.length ; o >= 0; o--) {
 								if(!objects[o]) continue
 								var tempobj2=objects[o].split(":")
 								if(tempobj1[2]==tempobj2[0]){
-	
 									tempobj1.shift();tempobj1.shift()
 									if(tempobj1[4]=="mob1"){tempobj1[4]="mob"}
 										else if(tempobj2[4]=="gramps1"){tempobj1[4]="gramps"}
@@ -601,21 +604,19 @@ try{
 						break
 					}
 				}
-				checkobjs=checkobjs.filter(item => item)
 				
-				
-			}else if(str1.indexOf("denied")==0){
+			}else if(str1.startsWith("denied")){
 				if(reseting==true) return
 				str1=str1.split(":")
 	
-				for (var i = checkobjs.length - 1; i >= 0; i--) {
+				for (var i = checkobjs.length ; i--;) {
 					var tempobj1=checkobjs[i].split(":")
 	
 					if(tempobj1[2]==str1[1] && tempobj1[3]==str1[2] && tempobj1[4]==str1[3]){
 						tempobj1[1]=Number(tempobj1[1])+1
 						if(tempobj1[1]==3 || tempobj1[1]>=Math.round(numberofplayers/2)){
 							checkobjs[i]=""
-							for(var o = objects.length - 1; o >= 0; o--){
+							for(var o = objects.length ; o >= 0; o--){
 								if(!objects[o]) continue
 								var tempobj2=objects[o].split(":")
 								if(tempobj1[2]==tempobj2[0]){
@@ -635,22 +636,21 @@ try{
 						break
 					}
 				}
-				checkobjs=checkobjs.filter(item => item)
 				
 			}
-			else if(str1.indexOf("chat:")==0){
+			else if(str1.startsWith("chat:")){
 				connection.afkcount=0
 				connection.msgcounter+=5
 				var str2=str1.split(":")
 				str2=str2.splice(1,str2.length)
 				str2=str2.join(":")
-				if(str2.indexOf("/adm")==0){
+				if(str2.startsWith("/adm")){
 					str2=str2.split(" ").splice(1,str2.length).join(" ")
-					if(admpassword!==undefined && str2==admpassword){
+					if(admpassword!==null && str2==admpassword){
 						connection.adm=true
 						connection.todo.push("chat::You're now admin!")
 					}
-				}if(str2.indexOf("/w")==0 || str2.indexOf("/whisper")==0){
+				}if(str2.startsWith("/w") || str2.startsWith("/whisper")){
 
 					for(var i=server.connections.length;i--;){
 						if(str2.split(" ")[1]==server.connections[i].playerid){
@@ -659,14 +659,14 @@ try{
 						}
 					}
 				}
-				else if(str2.indexOf("/list")==0 || str2.indexOf("/playerlist")==0){
+				else if(str2.startsWith("/list") || str2.startsWith("/playerlist")){
 					server.connections.forEach(function (connectionn) {
 						if(connectionn.playerid!==null && connectionn.playername!==null){
 							connection.todo.push("chat::"+connectionn.playername+" - ID:"+connectionn.playerid)
 						}
 	
 					})
-				}else if(str2.indexOf("/commands")==0){
+				}else if(str2.startsWith("/commands")){
 					connection.todo.push(`chat::/kick
 					/ban
 					/adm
@@ -676,7 +676,7 @@ try{
 					/list
 					/whisper
 					/begin`)
-				}else if(str2.indexOf("/kick")==0 && connection.adm===true){
+				}else if(str2.startsWith("/kick") && connection.adm===true){
 					str2=str2.split(" ")
 					for(var i=server.connections.length;i--;){
 						if(server.connections[i].playerid==str2[1]){
@@ -686,7 +686,7 @@ try{
 						}
 					}
 				}
-				else if(str2.indexOf("/ban")==0 && connection.adm===true){
+				else if(str2.startsWith("/ban") && connection.adm===true){
 					str2=str2.split(" ")
 
 					for(var i=server.connections.length;i--;){
@@ -697,20 +697,20 @@ try{
 							break
 						}
 					}
-				}else if(str2.indexOf("/closeserver")==0 && connection.adm===true){
+				}else if(str2.startsWith("/closeserver") && connection.adm===true){
 					str2=str2.split(" ")
 					for(var i=server.connections.length;i--;){
 						server.connections[i].sentpass=true
 					}
 					serverpass=str2[1]
 					connection.todo.push("chat::>Server is now password closed.")
-				}else if(str2.indexOf("/openserver")==0 && connection.adm===true){
-					serverpass=undefined
+				}else if(str2.startsWith("/openserver") && connection.adm===true){
+					serverpass=null
 					connection.todo.push("chat::>Server is now open to everyone.")
 				}else if(str2==="/begin" && connection.adm===true){
 					if(map=="default") begingame()
 					if(map=="free4all") begingamefree4all()
-				}else if(str2.indexOf("/mute")==0 && connection.adm===true){
+				}else if(str2.startsWith("/mute") && connection.adm===true){
 					str2=str2.split(" ")
 					
 					server.connections.forEach(function (connectionn) {
@@ -735,17 +735,17 @@ try{
 					}
 					})
 				}
-				else if(connection.muted!==true && connection.playerid!==null && (str2.indexOf("/")==0)==false){
+				else if(connection.muted!==true && connection.playerid!==null && (str2.startsWith("/"))==false){
 					broadcast("chat:"+connection.playername+":"+str2)
 				}
 	
 			}
-			else if(serverpass!==undefined && connection.sentpass!=false ){
+			else if(serverpass!==null && connection.sentpass!=false ){
 				if(connection.x!=str1.split(":")[0] || connection.y!=str1.split(":")[1]) connection.afkcount=0
 				connection.x=str1.split(":")[0]
 				connection.y=str1.split(":")[1]
 				broadcast("update:"+connection.playerid+":"+str1+":"+connection.playername+":"+connection.alive)
-			}else if(serverpass===undefined ){
+			}else if(serverpass===null ){
 				if(connection.x!=str1.split(":")[0] || connection.y!=str1.split(":")[1]) connection.afkcount=0
 				connection.x=str1.split(":")[0]
 				connection.y=str1.split(":")[1]
@@ -815,7 +815,7 @@ try{
 		on_start()
 	}
 	
-	setInterval(()=>{
+	function quicktimer(){
 		for (var i =0 ; i <  server.connections.length ; i++) {
 			server.connections[i].msgcounter=0
 		}
@@ -825,8 +825,15 @@ try{
 			broadcast("arrow:"+(sentries[i][1])+":"+sentries[i][2]+":"+sentries[i][3]+":3")
 			broadcast("arrow:"+sentries[i][1]+":"+(sentries[i][2])+":"+sentries[i][3]+":4")
 		}
+		for(var i=0;i<objects.length;i++){
+			if(objects[i].indexOf("mob1")>-1){
+				objects[i]=objects[i].replace("mob1","mob")
+			}
+		}
+		checkobjs=[]
 
-	},1000)
+	}
+	setInterval(quicktimer,1000)
 	
 	
 	function action_per_tick(){
@@ -892,7 +899,7 @@ try{
 	begingame=function(){
 		
 		reseting=false
-		if(timelapse==undefined){
+		if(timelapse==null){
 			var light=100
 			var modifier=-1
 			timelapse=setInterval(()=>{
@@ -930,7 +937,6 @@ try{
 		}
 		broadcast("gamewillbegin")
 		setTimeout(()=>{
-	
 	
 	
 			if(getRandomInt(1,4)>1){createobject(15,29,getRandomInt(4,11))}
@@ -984,7 +990,7 @@ try{
 					}
 					broadcast("message:Game has ended!\\|\\^")
 					reseting=true
-					clearTimeout(spawnmobs)
+					if(spawnmobs) clearTimeout(spawnmobs)
 					playersalive=numberofplayers
 					broadcast("reset")
 					broadcast("receivegold:"+initialgold)
@@ -1018,7 +1024,7 @@ try{
 	function begingamefree4all(){
 	
 		reseting=false
-		if(timelapse==undefined){
+		if(timelapse==null){
 			var light=100
 			var modifier=-1
 			timelapse=setInterval(()=>{
@@ -1100,7 +1106,7 @@ try{
 	}
 
 	function begingamezombies(){
-		
+		var timer
 		reseting=false
 		objects=[]
 		checkobjs=[]
@@ -1139,11 +1145,40 @@ try{
 
 			broadcast("begin")
 			broadcast('dead:'+(randomplayerid-1000))
+			timer=setTimeout(()=>{
+				if(playersalive>0){
+					broadcast("message:Humans win!\\|\\^")
+					broadcast("reset")
+						for(var i=server.connections.length;i--;){
+							if(server.connections[i].alive==true){
+								broadcast("message:"+server.connections[i].playername+` has won!
+									Kill count:`+server.connections[i].killcount+"\\|\\^")
+								break
+							}
+						}
+						broadcast("message:Game has ended!\\|\\^")
+						reseting=true
+						playersalive=numberofplayers
+						for(var u=1;u<=highestid;u++){
+							broadcast("eventid:"+u)
+							if(playercounter[u]===0){
+									broadcast("dead:"+u)
+								}
+						}
+						
+						clearInterval(checkendgame)
+						serverlock=false
+						if(numberofplayers>1 && map==="zombies"){
+							begingamezombies()
+						}
+	
+				}
+			},300000)
 			serverlock=true
 		},3000)
 
 		checkendgame=setInterval(()=>{
-			if(playersalive<2){
+			if(playersalive<1){
 				for(var i=server.connections.length;i--;){
 					if(server.connections[i].alive==true){
 						broadcast("message:"+server.connections[i].playername+` has won!
@@ -1162,6 +1197,7 @@ try{
 						}
 				}
 
+				clearTimeout(timer)
 				clearInterval(checkendgame)
 				serverlock=false
 				if(numberofplayers>1 && map==="zombies"){

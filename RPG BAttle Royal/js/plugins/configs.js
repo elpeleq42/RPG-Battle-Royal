@@ -4,11 +4,19 @@ window.currentvalueupdate=0
 window.counterids=1
 window.weapondelay=0
 window.server=function(){}
+worker=false
+window.serverpass=false
 
 
+var fs=require("fs")
+if(!fs.existsSync("./www/map")){
+fs.mkdirSync("./www/map");
+}
+fs=undefined
 
-
-
+window.open=function(){
+  console.log("Window.open has been disabled.")
+}
 
 
 //fullscreen checker on startup
@@ -20,13 +28,24 @@ if(localStorage.fullscreen=="true"){
     var win = nw.Window.get();
     win.enterFullscreen()
 }
+if(!localStorage.twitchname){
+  localStorage.twitchname=""
+}
+if(!localStorage.hidechat){
+  localStorage.hidechat=false
+}
+
+if(localStorage.hidechat==true){
+  document.getElementById('txtarea').style.visibility='hidden'
+}
 
 //changes to MV's functions
 Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType,check) {
+  
     if(x=='NaN' || y=='NaN') return
-    if(check==true || ($gameMap._mapId!=1 && $gameMap._mapId<5 )){
+    if(check==true || ($gameMap._mapId!=1 && $gameMap._mapId<5 ) || $gameMap._mapId>5){
         this._transferring = true;
-        if($gameMap._mapId==1 || $gameMap._mapId>4){
+        if(($gameMap._mapId==1 || $gameMap._mapId>4 ) && $gameMap._mapId<9){
             this._newMapId = $gameMap._mapId;
             
         }else{
@@ -37,7 +56,7 @@ Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType,check)
         this._newY = y;
         this._newDirection = d;
         this._fadeType = fadeType;
-
+        
         
     }else{
         worker.postMessage("tpevent:"+x+":"+y+":"+playerid)
@@ -51,6 +70,7 @@ Game_BattlerBase.prototype.setMp = function(mp) {
 };
 
 Game_BattlerBase.prototype.setHp = function(hp) {
+  if(hp<0) $gameScreen.startFlash([255, 0, 0, 128], 8);
     this._hp = hp;
     changeHPBar(hp*100/$gameActors.actor(1).mhp)
     this.refresh();
@@ -58,7 +78,7 @@ Game_BattlerBase.prototype.setHp = function(hp) {
 
 Game_Party.prototype.gainGold = function(amount) {
     this._gold = (this._gold + amount).clamp(0, this.maxGold());
-    setGoldText(this._gold)
+    setGoldText(this._gold?this._gold:$gameParty._gold)
 };
 
 //Function to block right click context menu
@@ -323,6 +343,7 @@ Scene_Map.prototype.updateScene = function() {
 
     if (!SceneManager.isSceneChanging()) {
         this.updateTransferPlayer();
+        
     }
     if (!SceneManager.isSceneChanging()) {
         this.updateEncounter();
@@ -339,6 +360,10 @@ Scene_Map.prototype.updateScene = function() {
 
 if(!localStorage.texttospeech){
     localStorage.texttospeech=false
+    
+}
+if(!localStorage.crtmode){
+    localStorage.crtmode=true
 }
 
 
@@ -390,16 +415,16 @@ SceneManager.update = function() {
 
 SceneManager.updateMain = function() {
     var newTime = this._getTimeInMsWithoutMobileSafari();
-        var fTime = (newTime - this._currentTime) / 1000;
-        if (fTime > 0.25) fTime = 0.25;
-        this._currentTime = newTime;
-        this._accumulator += fTime;
-        while (this._accumulator >= this._deltaTime) {
-            this.updateInputData();
-            this.changeScene();
-            this.updateScene();
-            this._accumulator -= this._deltaTime;
-        }
+    var fTime = (newTime - this._currentTime) / 1000;
+    if (fTime > 0.25) fTime = 0.25;
+    this._currentTime = newTime;
+    this._accumulator += fTime;
+    while (this._accumulator >= this._deltaTime) {
+        this.updateInputData();
+        this.changeScene();
+        this.updateScene();
+        this._accumulator -= this._deltaTime;
+    }
     this.renderScene();
     this.requestUpdate();
 };
@@ -420,7 +445,7 @@ Game_CharacterBase.prototype.requestAnimation = function(animationId,confirm) {
         if(confirm=="true"){
             this._animationId = animationId;
         }else{
-            this._animationId = (animationId+11);
+            this._animationId = (animationId+12);
         }
     }else{
         this._animationId = animationId;
@@ -428,9 +453,271 @@ Game_CharacterBase.prototype.requestAnimation = function(animationId,confirm) {
 };
 
 
+///////////////////
+
+
+
 ///////
 
 
 window.gc()
 
+
+
+var previouscheck=undefined
+serverjoin=function() {
+
+    var hasloaded=false
+    
+      document.getElementById('loadingtext').innerText = "Connecting..."
+      setTimeout(()=>{
+  
+    
+    var connection = new WebSocket(finallist[join])
+    
+    connection.onopen = function () {
+      
+      document.getElementById('cancelbutton').style.visibility="visible"
+      setTimeout(()=>{
+    
+        connection.send("map?")
+      },33)
+    }
+    buffermap=[]
+    connection.onmessage=function(msgg){
+    
+      msg=msgg.data
+      window.worker = new Worker("js/webworker.js");
+    if(msg==="default"){
+      hasloaded=true
+      document.getElementById('loadingtext').innerText = "Loading Map..."
+      connection.close()
+      require('nw.gui').Window.get().focus()
+    $gamePlayer.reserveTransfer(1,12,15,2,2);
+    checkmap=setInterval(()=>{
+                  if($gameMap._mapId==1 && $dataMap!=undefined && $dataMap.scrollType!=undefined){
+                    turnHUDonoff();
+                    $gameTemp.reserveCommonEvent(6)
+                    document.getElementById('cancelbutton').style.visibility="hidden"
+                    clearInterval(checkmap)
+                  }
+    
+                },50)
+    }else if(msg==="free4all"){
+      hasloaded=true
+      document.getElementById('loadingtext').innerText = "Loading Map..."
+      connection.close()
+      require('nw.gui').Window.get().focus()
+    $gamePlayer.reserveTransfer(6,12,15,2,2);
+    checkmap=setInterval(()=>{
+                  if(($gameMap._mapId==1 ||$gameMap._mapId==6 ||$gameMap._mapId==7 )&& $dataMap!=undefined && $dataMap.scrollType!=undefined){
+                    turnHUDonoff();
+                    $gameTemp.reserveCommonEvent(6)
+                    document.getElementById('cancelbutton').style.visibility="hidden"
+                    clearInterval(checkmap)
+                  }
+    
+                },50)
+    }else if(msg==="zombies"){
+      hasloaded=true
+      document.getElementById('loadingtext').innerText = "Loading Map..."
+      connection.close()
+      require('nw.gui').Window.get().focus()
+    $gamePlayer.reserveTransfer(7,33,29,2,2);
+    checkmap=setInterval(()=>{
+                  if(($gameMap._mapId==1 ||$gameMap._mapId==6 ||$gameMap._mapId==7 )&& $dataMap!=undefined && $dataMap.scrollType!=undefined){
+                    turnHUDonoff();
+                    $gameTemp.reserveCommonEvent(6)
+                    document.getElementById('cancelbutton').style.visibility="hidden"
+                    clearInterval(checkmap)
+                  }
+    
+                },50)
+    }else if(msg.startsWith("http")){
+    
+    document.getElementById('loadingtext').innerText = "Downloading Map Data..."
+    
+    hasloaded=true
+    
+    var downloadspeed=0
+    var checkdownloadspeed=setInterval(()=>{
+    downloadspeed=((fs.statSync("./www/map/test.zip").size/(1024*1024))-downloadspeed)
+    document.getElementById('loadingtext').innerText="Downloading Map Data..."+downloadspeed.toFixed(2)+"MBps"
+    },1000)
+    
+    download(msg,"./www/map/test.zip",function(){
+    
+    
+    
+        clearInterval(checkdownloadspeed)
+    
+        var filehandler=new Worker("./js/filehandler.js")
+        document.getElementById('loadingtext').innerText = "Extracting Map..."
+        filehandler.onmessage=function(event){
+          var msg=event.data
+    
+          if(msg=="end"){
+                filehandler.terminate()
+                fs.copyFileSync('./www/map/data/Map001.json', './www/data/Map005.json')
+                var map5=JSON.parse(fs.readFileSync('./www/map/data/MapInfos.json'))[1]
+                map5.id=5
+                map5.order=5
+                $dataMapInfos[5]=map5
+                var tempcommonevents=JSON.parse(fs.readFileSync("./www/map/data/CommonEvents.json"))
+                for(var i=1;i<tempcommonevents.length;i++){
+                  tempcommonevents[i].id=tempcommonevents[i].id+11
+                }
+                $dataCommonEvents=$dataCommonEvents.concat(tempcommonevents)
+    
+                $dataTilesets=JSON.parse(fs.readFileSync('./www/map/data/Tilesets.json'))
+    
+                var tempanimations=JSON.parse(fs.readFileSync('./www/map/data/Animations.json'))
+                for(var i=1;i<tempanimations.length;i++){
+                  tempanimations[i].id=tempanimations[i].id+12
+                }
+                $dataAnimations=$dataAnimations.concat(tempanimations)
+                $dataSystem=JSON.parse(fs.readFileSync("./www/map/data/System.json"))
+                $dataActors=JSON.parse(fs.readFileSync("./www/map/data/Actors.json"))
+                
+                document.getElementById('loadingtext').innerText = "Loading Map..."
+                connection.close()
+                require('nw.gui').Window.get().focus()
+                $gamePlayer.reserveTransfer(5,5,3,2,2);
+                var checkmap=setInterval(()=>{
+                  if($gameMap._mapId==5 && $dataMap!=undefined && $dataMap.scrollType!=undefined){
+                    turnHUDonoff();
+                    $gameTemp.reserveCommonEvent(6,true)
+                    document.getElementById('cancelbutton').style.visibility="hidden"
+                    clearInterval(checkmap)
+                  }
+    
+                },33)
+          }else{
+            document.getElementById('loadingtext').innerText = "Error."
+            setTimeout(()=>{
+              location.reload()
+              },1250)
+          }
+    
+        }
+      
+    })
+    
+    
+    
+    }else if(msg!=="pass?"){
+    if(msg==="finished"){
+      hasloaded=true
+      for(var i=0;i<buffermap.length;i++){
+        buffermap[i]=Buffer.from(buffermap[i], 'binary')
+      }
+      var buffer = Buffer.concat(buffermap)
+      buffermap=undefined
+      window.gc()
+        fs.writeFile("./www/map/test.zip", buffer,function(){
+        
+          var filehandler=new Worker("./js/filehandler.js")
+        document.getElementById('loadingtext').innerText = "Extracting Map..."
+        filehandler.onmessage=function(event){
+          var msg=event.data
+    
+          if(msg=="end"){
+                filehandler.terminate()
+                fs.copyFileSync('./www/map/data/Map001.json', './www/data/Map005.json')
+                var map5=JSON.parse(fs.readFileSync('./www/map/data/MapInfos.json'))[1]
+                map5.id=5
+                map5.order=5
+                $dataMapInfos[5]=map5
+                var tempcommonevents=JSON.parse(fs.readFileSync("./www/map/data/CommonEvents.json"))
+                for(var i=1;i<tempcommonevents.length;i++){
+                  tempcommonevents[i].id=tempcommonevents[i].id+11
+                }
+                $dataCommonEvents=$dataCommonEvents.concat(tempcommonevents)
+    
+                $dataTilesets=JSON.parse(fs.readFileSync('./www/map/data/Tilesets.json'))
+                var tempanimations=JSON.parse(fs.readFileSync('./www/map/data/Animations.json'))
+                for(var i=1;i<tempanimations.length;i++){
+                  tempanimations[i].id=tempanimations[i].id+12
+                }
+                $dataAnimations=$dataAnimations.concat(tempanimations)
+                $dataSystem=JSON.parse(fs.readFileSync("./www/map/data/System.json"))
+                $dataActors=JSON.parse(fs.readFileSync("./www/map/data/Actors.json"))
+                
+                document.getElementById('loadingtext').innerText = "Loading Map..."
+                connection.close()
+                require('nw.gui').Window.get().focus()
+                $gamePlayer.reserveTransfer(5,5,3,2,2);
+                var checkmap=setInterval(()=>{
+                  if($gameMap._mapId==5 && $dataMap!=undefined && $dataMap.scrollType!=undefined){
+                    turnHUDonoff();
+                    $gameTemp.reserveCommonEvent(6,true)
+                    document.getElementById('cancelbutton').style.visibility="hidden"
+                    clearInterval(checkmap)
+                  }
+    
+                },33)
+          }else{
+            document.getElementById('loadingtext').innerText = "Error."
+            setTimeout(()=>{
+              location.reload()
+              },1250)
+          }
+    
+        }
+    
+        });
+    }else{
+      
+    document.getElementById('loadingtext').innerText = "Downloading Map Data..."
+
+    if(previouscheck==undefined){
+
+      previouscheck=0
+      timechecker=0
+    }else{
+
+      previouscheck=( (( msg.length/(( performance.now()-timechecker )/1000) )/(1024*1024)))
+      document.getElementById('loadingtext').innerText = "Downloading Map Data..."+previouscheck.toFixed(2)+"MBps"
+    }
+    
+    buffermap.push(msg)
+    timechecker=performance.now()
+    
+    }
+    
+        
+        
+      
+    }else{
+      window.serverpass=prompt("Type the server password")
+      connection.send(serverpass)
+    }
+    
+    }
+    connection.onclose=function(){
+      if(hasloaded==false){
+      document.getElementById('loadingtext').innerText = "Error"
+      setTimeout(()=>{
+      location.reload()
+      },1250)
+      }
+    }
+    
+    
+    },50)
+    
+  
+    
+    
+      
+    
+    }
+
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min)) + min;
+      }
+
+      
 

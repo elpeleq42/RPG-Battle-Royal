@@ -304,10 +304,10 @@ window.chatHistory = [];
        }
      }
      //Toggle Chat Windows On/Off
-     if (Input.isTriggered('chat') && chatopen===false){
+     if (Input.isTriggered('chat') && chatopen===false && localStorage.hidechat==false){
        this.toggleChat();
      }
-      if ((escpressed===true||Input.isTriggered('chatsend')) && chatopen===true){
+      if ((escpressed===true||Input.isTriggered('chatsend')) && chatopen===true && localStorage.hidechat==false){
       escpressed=false
        this.toggleChat();
        
@@ -330,7 +330,7 @@ window.chatHistory = [];
 
    Scene_Map.prototype.toggleChat = function(){
      if (document.getElementById('chatInput').style.visibility ==='hidden'){
-      chatopen=true;
+       chatopen=true;
        document.getElementById('txtarea').style.overflowY='scroll'
        document.getElementById('txtarea').style.background = textWinBack;
        document.getElementById('chatInput').style.visibility = 'visible';

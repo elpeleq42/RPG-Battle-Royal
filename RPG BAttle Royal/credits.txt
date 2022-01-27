@@ -1,7 +1,7 @@
 Programming:
+peq42 - Majority of scripts/code
 HUDELL - OrangeMoveCharacterTo
 HUDELL - Mapscreenshot
-Mog - Footsteps
 Biud436 - RS_InputDialog
 HIME - CommonEventQueue
 Yanfly - YEP_EventSpawner(modified)
@@ -15,14 +15,32 @@ Yanfly - KeyboardConfig(modified)
 Yanfly - GamepadConfig
 Yami - Skip Title
 Nelderson - MV Online (Chat plugin, modified)
+Galv - GALV Diagonal Movement
 Chaucer - Game Scene Stabilizer
 Irina - PerformanceUpgrade
+krmbn0576 - AudioStreaming
+Quxios - QAudio
+TMI.js - Twitch(under The MIT License)
 
-Engine:
-RPG Maker MV - Kadokawa
+Art:
+Grassfur - Flowers
+Gothicvoid - pumpkin and tombstone
+peq42 - minor modifications and sprites
 
 Audio:
-Steps on water/ground sound effects obtained from the original Counter-Strike Copyright © Valve Corporation
+Steps on water/ground sound effects - Free Sound Effects Site. CC Attribution 4 https://creativecommons.org/licenses/by/4.0
 Coconut sound effects obtained from https://www.zapsplat.com
 little_robot_sound_factory_Zombie_00 - From zapsplat - CC Attribution 4 https://creativecommons.org/licenses/by/4.0
 horror_monster_zombie_male_groan_011 obtained from https://www.zapsplat.com
+zapsplat_horror_monster_hard_hit_impact_kill_growl_squelch_78123 obtained from https://www.zapsplat.com
+Chasing Victory (Main) - ZakharValaha
+Elevator Music - Lesfm
+Just relax - Lesfm
+Caves of Dawn - GuilhermeBernardes
+Just Lofi - Relax Background Music For Videos - Lesfm
+A Pirate's Life - TommyMutiu
+Compromising Solo Guitars Ambient Hip Hop - Nesrality
+Foxes Attack - MokuseiNoMaguro
+
+Engine:
+RPG Maker MV - Kadokawa

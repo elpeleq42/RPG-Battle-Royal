@@ -427,12 +427,6 @@ Yanfly.SpawnEventFailChecks = function(mapId, eventId, x, y) {
     }
     return true;
   }
-  if ($gameMap.eventsXy(x, y).length > 0) {
-
-  }
-  if ($gameMap.boat().posNt(x, y) || $gameMap.ship().posNt(x, y)) {
-
-  }
   if (x < 0 || x >= $gameMap.width() || y < 0 || y >= $gameMap.height()) {
     if ($gameTemp.isPlaytest()) {
       console.log('Cannot spawn event at ' + x + ', ' + y + '.' + 
@@ -445,14 +439,11 @@ Yanfly.SpawnEventFailChecks = function(mapId, eventId, x, y) {
 
 Yanfly.SpawnEvent = function(mapId, eventId, x, y, preserved, mynameis) {
   if ($gameParty.inBattle()) return;
-  if (Yanfly.SpawnEventFailChecks(mapId, eventId, x, y)) return;
   preserved = preserved || false;
   $gameMap.spawnEvent(mapId, eventId, x, y, preserved, mynameis);
 };
 Yanfly.SpawnEvent1 = function(mapId, eventId, x, y, preserved, mynameis,direction1) {
   if(!direction1) direction1=""
-  if ($gameParty.inBattle()) return;
-  if (Yanfly.SpawnEventFailChecks(mapId, eventId, x, y)) return;
   preserved = preserved || false;
   $gameMap.spawnEvent1(mapId, eventId, x, y, preserved, mynameis,direction1);
 };

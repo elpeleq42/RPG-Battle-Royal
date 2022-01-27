@@ -1,5 +1,6 @@
 
 //Loading Text
+var $thereisaminimap=false
 var OnlineChat_createDisplayObj_Scene_Map1 = Scene_Map.prototype.createDisplayObjects;
 Scene_Map.prototype.createDisplayObjects = function() {
   OnlineChat_createDisplayObj_Scene_Map1.call(this);
@@ -170,7 +171,7 @@ this.goldtext.style.position = 'absolute';
 this.goldtext.style.fontSize="16px";
 this.goldtext.style.color="white";
 this.goldtext.style.visibility="hidden"
-
+this.goldtext.innerText="Gold: "+$gameParty._gold
 
   document.body.appendChild(this.goldtext)
 Graphics._centerElement(this.goldtext);
@@ -180,6 +181,7 @@ document.getElementById('goldtext').style.top=(Number(document.getElementById("G
  }
 
 function setGoldText(value){
+  if(!value) value=$gameParty._gold
 document.getElementById('goldtext').innerText="Gold: " + value
 }
 
@@ -191,7 +193,7 @@ var thereisaminimapfile
       if (SceneManager._scene instanceof Scene_Map) {
       screenshotmap()
       clearInterval(waitcreateminimap)
-
+$thereisaminimap=true
       this.playerindicator = document.createElement('div');
       this.playerindicator.style.backgroundColor="red"
       this.playerindicator.style.width=(Math.round((200/$gameMap.width())<1?1:200/$gameMap.width())+"px")
@@ -352,8 +354,9 @@ Scene_Map.prototype.createupdatetext = function(){
   
   })
   document.getElementById('updatetext').style.right="0px"
-document.getElementById('updatetext').style.top="0px"
+document.getElementById('updatetext').style.bottom="0px"
 }
+
 
 
  Scene_Map.prototype.createShieldPIC = function(){
@@ -405,34 +408,38 @@ if(previousgamex==undefined){
   previousgamey=720
   }
 
+var $gamevideocss=false
 function intervalchecker(){
 
   
-  
-  document.getElementById("playerindicator").style.right=((Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*-9/10)+(100-$gamePlayer._x*96/Math.floor($dataMap.width*48/100)))+"px"
-  document.getElementById("playerindicator").style.top=((Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*-84/100)-(100-$gamePlayer._y*96/Math.floor($dataMap.height*48/100)))+"px"
-  
-  
-  
-  if(previousgamey==document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2) && previousgamex==document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2)) return
-  
+  if($gameParty)setGoldText($gameParty._gold)
+  if(!$gamevideocss) $gamevideocss=document.getElementById("GameVideo").style
+  if($thereisaminimap){
+    document.getElementById("playerindicator").style.right=((Number($gamevideocss.width.slice(0,$gamevideocss.width.length-2))*-9/10)+(100-$gamePlayer._x*96/Math.floor($dataMap.width*48/100)))+"px"
+  document.getElementById("playerindicator").style.top=((Number($gamevideocss.height.slice(0,$gamevideocss.height.length-2))*-84/100)-(100-$gamePlayer._y*96/Math.floor($dataMap.height*48/100)))+"px"
+  }
   
   
   
-  var gamex=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*3/4
-  var gamey=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*3/4
+  if(previousgamey==$gamevideocss.height.slice(0,$gamevideocss.height.length-2) && previousgamex==$gamevideocss.width.slice(0,$gamevideocss.width.length-2)) return
   
   
-  var gamex2=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*9/10
-  var gamey2=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*9/10
   
   
-  var gamex3=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*12/20
-  var gamey3=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*14/20
+  var gamex=Number($gamevideocss.width.slice(0,$gamevideocss.width.length-2))*3/4
+  var gamey=Number($gamevideocss.height.slice(0,$gamevideocss.height.length-2))*3/4
   
   
-  var gamex4=Number(document.getElementById("GameVideo").style.width.slice(0,document.getElementById("GameVideo").style.width.length-2))*84/100
-  var gamey4=Number(document.getElementById("GameVideo").style.height.slice(0,document.getElementById("GameVideo").style.height.length-2))*84/100
+  var gamex2=Number($gamevideocss.width.slice(0,$gamevideocss.width.length-2))*9/10
+  var gamey2=Number($gamevideocss.height.slice(0,$gamevideocss.height.length-2))*9/10
+  
+  
+  var gamex3=Number($gamevideocss.width.slice(0,$gamevideocss.width.length-2))*12/20
+  var gamey3=Number($gamevideocss.height.slice(0,$gamevideocss.height.length-2))*14/20
+  
+  
+  var gamex4=Number($gamevideocss.width.slice(0,$gamevideocss.width.length-2))*84/100
+  var gamey4=Number($gamevideocss.height.slice(0,$gamevideocss.height.length-2))*84/100
   
   try{document.getElementById('loadingtext').style.left="-"+(gamex2)+"px"
   document.getElementById('loadingtext').style.top=(gamey4)+"px"

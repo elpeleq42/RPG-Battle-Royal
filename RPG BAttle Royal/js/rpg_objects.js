@@ -493,7 +493,7 @@ Game_Message.prototype.isItemChoice = function() {
 };
 
 Game_Message.prototype.isBusy = function() {
-    return (this.hasText() || this.isChoice() ||
+    return ( this.isChoice() ||
             this.isNumberInput() || this.isItemChoice());
 };
 
@@ -879,11 +879,11 @@ Game_Screen.prototype.updateWeather = function() {
 };
 
 Game_Screen.prototype.updatePictures = function() {
-    this._pictures.forEach(function(picture) {
-        if (picture) {
-            picture.update();
+    for(var i=0;i<this._pictures.length;i++){
+        if (this._pictures[i]) {
+            this._pictures[i].update();
         }
-    });
+    }
 };
 
 Game_Screen.prototype.startFlashForDamage = function() {
@@ -5557,9 +5557,13 @@ Game_Map.prototype.setupEvents = function() {
 };
 
 Game_Map.prototype.events = function() {
-    return this._events.filter(function(event) {
-        return !!event;
-    });
+    var allevents=this._events
+    var alleventslength=allevents.length
+    var result=[]
+    for(var i=0;i<alleventslength;i++){
+        if(!!allevents[i] && allevents[i]._erased==false ) result.push(allevents[i])
+    }
+    return result
 };
 
 Game_Map.prototype.event = function(eventId) {
@@ -5807,9 +5811,10 @@ Game_Map.prototype.refreshIfNeeded = function() {
 };
 
 Game_Map.prototype.refresh = function() {
-    this.events().forEach(function(event) {
-        event.refresh();
-    });
+    var allevents=this.events()
+    for(var i=0;i<allevents.length;i++){
+        allevents[i].refresh();
+    }
     this._commonEvents.forEach(function(event) {
         event.refresh();
     });
@@ -5818,27 +5823,45 @@ Game_Map.prototype.refresh = function() {
 };
 
 Game_Map.prototype.refreshTileEvents = function() {
-    this.tileEvents = this.events().filter(function(event) {
-        return event.isTile();
-    });
+    var allevents=this.events()
+    var temp=[]
+    for(var i=0;i<allevents.length;i++){
+        if(allevents[i].isTile()){
+            temp.push(allevents[i])
+        }
+    }
+    this.tileEvents=temp
+    
 };
 
 Game_Map.prototype.eventsXy = function(x, y) {
-    return this.events().filter(function(event) {
-        return event.pos(x, y);
-    });
+    var events=this.events()
+    var result=[]
+    for(var i=0;i<events.length;i++){
+        if(events[i]._x==x && events[i]._y==y) result.push(events[i])
+    }
+    
+    return result
 };
 
 Game_Map.prototype.eventsXyNt = function(x, y) {
-    return this.events().filter(function(event) {
-        return event.posNt(x, y);
-    });
+    var allevents=this.events()
+    var temp=[]
+    for(var i=0;i<allevents.length;i++){
+        if(allevents[i].posNt(x, y)){
+            temp.push(allevents[i])
+        }
+    }
+    return temp
 };
 
 Game_Map.prototype.tileEventsXy = function(x, y) {
-    return this.tileEvents.filter(function(event) {
-        return event.posNt(x, y);
-    });
+    var allevents=this.tileEvents
+    var result=[]
+    for(var i=0;i<allevents;i++){
+        if(allevents[i].posNt(x, y)) result.push(allevents[i])
+    }
+    return result
 };
 
 Game_Map.prototype.eventIdXy = function(x, y) {
@@ -6062,12 +6085,14 @@ Game_Map.prototype.doScroll = function(direction, distance) {
 };
 
 Game_Map.prototype.updateEvents = function() {
-    this.events().forEach(function(event) {
-        event.update();
-    });
-    this._commonEvents.forEach(function(event) {
-        event.update();
-    });
+    var allevents=this.events()
+    for(var i=0;i<allevents.length;i++){
+        if(allevents[i]._erased==false ) allevents[i].update();
+    }
+    allevents=this._commonEvents
+    for(var i=0;i<allevents.length;i++){
+        allevents[i].update();
+    }
 };
 
 Game_Map.prototype.updateVehicles = function() {
@@ -7613,11 +7638,12 @@ Game_Player.prototype.executeEncounter = function() {
 
 Game_Player.prototype.startMapEvent = function(x, y, triggers, normal) {
     if (!$gameMap.isEventRunning()) {
-        $gameMap.eventsXy(x, y).forEach(function(event) {
-            if (event.isTriggerIn(triggers) && event.isNormalPriority() === normal) {
-                event.start();
+        var events=$gameMap.eventsXy(x, y)
+        for(var i=events.length;i--;){
+            if (events[i].isTriggerIn(triggers) && events[i].isNormalPriority() === normal) {
+                events[i].start();
             }
-        });
+        }
     }
 };
 
@@ -8593,10 +8619,14 @@ Game_Event.prototype.start = function() {
         }
     }
 };
+$eventpropereraser=function(id){
+    $gameMap._events[id]=null
+}
 
 Game_Event.prototype.erase = function() {
     this._erased = true;
     this.refresh();
+    setTimeout($eventpropereraser,1000,this._eventId)
 };
 
 Game_Event.prototype.refresh = function() {
@@ -8735,12 +8765,14 @@ Game_Event.prototype.checkEventTriggerAuto = function() {
 };
 
 Game_Event.prototype.update = function() {
+    if(this._erased==true) return
     Game_Character.prototype.update.call(this);
     this.checkEventTriggerAuto();
     this.updateParallel();
 };
 
 Game_Event.prototype.updateParallel = function() {
+    if(this._erased==true ) return
     if (this._interpreter) {
         if (!this._interpreter.isRunning()) {
             this._interpreter.setup(this.list(), this._eventId);
@@ -9047,6 +9079,7 @@ Game_Interpreter.prototype.changeHp = function(target, value, allowDeath) {
         if (!allowDeath && target.hp <= -value) {
             value = 1 - target.hp;
         }
+        if(value<0) $gameScreen.startFlash([255, 0, 0, 128], 8);
         target.gainHp(value);
         if (target.isDead()) {
             target.performCollapse();
@@ -10522,9 +10555,9 @@ Game_Interpreter.prototype.pluginCommand = function(command, args) {
 Game_Interpreter.requestImages = function(list, commonList){
     if(!list) return;
 
-    list.forEach(function(command){
-        var params = command.parameters;
-        switch(command.code){
+    for(var i=0;i<list.length;i++){
+        var params = list[i].parameters;
+        switch(list[i].code){
             // Show Text
             case 101:
                 ImageManager.requestFace(params[0]);
@@ -10556,12 +10589,12 @@ Game_Interpreter.requestImages = function(list, commonList){
             // Set Movement Route
             case 205:
                 if(params[1]){
-                    params[1].list.forEach(function(command){
-                        var params = command.parameters;
-                        if(command.code === Game_Character.ROUTE_CHANGE_IMAGE){
+                    for(var z=0;z<params[1].list.length;z++){
+                        var params = list[i].parameters;
+                        if(list[i].code === Game_Character.ROUTE_CHANGE_IMAGE){
                             ImageManager.requestCharacter(params[0]);
                         }
-                    });
+                    }
                 }
                 break;
 
@@ -10643,5 +10676,5 @@ Game_Interpreter.requestImages = function(list, commonList){
                 }
                 break;
         }
-    });
+    }
 };

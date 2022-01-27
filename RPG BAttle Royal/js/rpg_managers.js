@@ -1378,9 +1378,10 @@ AudioManager.updateSeParameters = function(buffer, se) {
 };
 
 AudioManager.stopSe = function() {
-    this._seBuffers.forEach(function(buffer) {
-        buffer.stop();
-    });
+    var sebuffers=this._seBuffers
+    for(var i=0;i<sebuffers.length;i++){
+        sebuffers[i].stop();
+    }
     this._seBuffers = [];
 };
 
@@ -1464,13 +1465,9 @@ AudioManager.makeEmptyAudioObject = function() {
 AudioManager.createBuffer = function(folder, name) {
     var ext = this.audioFileExt();
     var url = this._path + folder + '/' + encodeURIComponent(name) + ext;
-    if (this.shouldUseHtml5Audio() && folder === 'bgm') {
-        if(this._blobUrl) Html5Audio.setup(this._blobUrl);
-        else Html5Audio.setup(url);
-        return Html5Audio;
-    } else {
-        return new WebAudio(url);
-    }
+    
+    return new WebAudio(url);
+    
 };
 
 AudioManager.updateBufferParameters = function(buffer, configVolume, audio) {
@@ -1499,12 +1496,12 @@ AudioManager.checkErrors = function() {
     this.checkWebAudioError(this._bgmBuffer);
     this.checkWebAudioError(this._bgsBuffer);
     this.checkWebAudioError(this._meBuffer);
-    this._seBuffers.forEach(function(buffer) {
-        this.checkWebAudioError(buffer);
-    }.bind(this));
-    this._staticBuffers.forEach(function(buffer) {
-        this.checkWebAudioError(buffer);
-    }.bind(this));
+    for(var i=0;i<this._seBuffers.length;i++){
+        this.checkWebAudioError(this._seBuffers[i]);
+    }
+    for(var i=0;i<this._staticBuffers;i++){
+        this.checkWebAudioError(this._staticBuffers[i]);
+    }
 };
 
 AudioManager.checkWebAudioError = function(webAudio) {
@@ -1900,9 +1897,6 @@ SceneManager.requestUpdate = function() {
 SceneManager.update = function() {
     try {
         this.tickStart();
-        if (Utils.isMobileSafari()) {
-            this.updateInputData();
-        }
         this.updateManagers();
         this.updateMain();
         this.tickEnd();
