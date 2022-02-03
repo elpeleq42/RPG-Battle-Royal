@@ -363,7 +363,7 @@ if(!localStorage.texttospeech){
     
 }
 if(!localStorage.crtmode){
-    localStorage.crtmode=true
+    localStorage.crtmode=false
 }
 
 
@@ -445,7 +445,7 @@ Game_CharacterBase.prototype.requestAnimation = function(animationId,confirm) {
         if(confirm=="true"){
             this._animationId = animationId;
         }else{
-            this._animationId = (animationId+12);
+            this._animationId = (animationId+13);
         }
     }else{
         this._animationId = animationId;
@@ -721,3 +721,13 @@ serverjoin=function() {
 
       
 
+$gameMap.eventServerId=function(id){
+  var current
+  for(var i=$gameMap._events.length;i--;){
+    current=$gameMap._events[i]
+    if(current && current._erased==false && current.serverID && current.serverID==id){
+      return current
+    }
+  }
+
+}

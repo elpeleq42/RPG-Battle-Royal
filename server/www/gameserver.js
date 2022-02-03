@@ -498,7 +498,7 @@ try{
 				
 				if(connection.alive==true){
 					broadcast("chat::"+connection.playername+" has died.")
-					createobject(connection.x,connection.y,22)
+					createObject(connection.x,connection.y,22)
 				}
 				broadcast(str1)
 				if(map=="default"){
@@ -869,13 +869,45 @@ try{
 	  return Math.floor(Math.random() * (max - min)) + min;
 	}
 	
-	function createobject(x,y,objid,extra,tp,playerid){
+	function createObject(x,y,objid,extra,tp,playerid){
 		if(!extra) extra=""
 		if(!tp) tp=""
 		if(!playerid) playerid=""
 		broadcast("build:"+x+":"+y+":"+objid+":"+objectcounter+":"+extra+":"+tp+":"+playerid)
 		objects.push(objectcounter+":"+x+":"+y+":"+objid+":"+extra+":"+tp+":"+playerid)
 		objectcounter++
+		return (objectcounter-1)
+	}
+
+	function moveObject(id,x,y){
+		for(var i=objects.length;i--;){
+			if(objects.startsWith(id)){
+				var temp=objects[i].split(":")
+				temp[1]=x
+				temp[2]=y
+				objects[i]=temp.join(":")
+				break
+			}
+		}
+		broadcast("movemob:"+id+":"+x+":"+y)
+	}
+
+	function getObjectInfo(id){
+		for(var i=objects.length;i--;){
+			if(objects.startsWith(id)){
+				var temp=objects[i].split(":")
+				var temp1={
+					id:temp[0],
+					x:temp[1],
+					y:temp[2],
+					spawnid:temp[3],
+					extra:temp[4],
+					tp:temp[5],
+					playerid:temp[6]
+				}
+				return temp1
+			}
+		}
 	}
 	
 	setInterval(()=>{
@@ -939,40 +971,40 @@ try{
 		setTimeout(()=>{
 	
 	
-			if(getRandomInt(1,4)>1){createobject(15,29,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(22,20,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(24,11,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(22,42,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(59,10,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(49,26,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(41,33,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(63,31,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(61,43,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(71,51,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(56,68,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(20,78,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(47,79,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(79,58,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(86,41,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(99,23,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(52,97,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(41,39,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(75,15,getRandomInt(4,11))}
-			if(getRandomInt(1,4)>1){createobject(68,41,getRandomInt(4,11))}
-			createobject(70,43,19,"gramps")
+			if(getRandomInt(1,4)>1){createObject(15,29,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(22,20,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(24,11,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(22,42,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(59,10,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(49,26,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(41,33,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(63,31,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(61,43,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(71,51,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(56,68,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(20,78,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(47,79,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(79,58,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(86,41,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(99,23,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(52,97,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(41,39,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(75,15,getRandomInt(4,11))}
+			if(getRandomInt(1,4)>1){createObject(68,41,getRandomInt(4,11))}
+			createObject(70,43,19,"gramps")
 	
 			spawnmobs=setTimeout(()=>{
-				if(getRandomInt(1,3)>1){createobject(52,34,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(67,41,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(19,78,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(48,79,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(98,24,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(71,52,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(23,42,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(41,34,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(78,59,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(15,28,18,"mob")}
-				if(getRandomInt(1,3)>1){createobject(41,38,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(52,34,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(67,41,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(19,78,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(48,79,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(98,24,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(71,52,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(23,42,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(41,34,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(78,59,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(15,28,18,"mob")}
+				if(getRandomInt(1,3)>1){createObject(41,38,18,"mob")}
 			},8000)
 	
 	
@@ -1051,7 +1083,7 @@ try{
 			
 	
 			if(getRandomInt(1,4)>2){
-				createobject(possibleX[possibleresult],possibleY[possibleresult],getRandomInt(4,11))
+				createObject(possibleX[possibleresult],possibleY[possibleresult],getRandomInt(4,11))
 			}
 			
 			

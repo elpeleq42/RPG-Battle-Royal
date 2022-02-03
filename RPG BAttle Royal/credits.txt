@@ -25,6 +25,7 @@ TMI.js - Twitch(under The MIT License)
 Art:
 Grassfur - Flowers
 Gothicvoid - pumpkin and tombstone
+Candacis - palmtree
 peq42 - minor modifications and sprites
 
 Audio:
@@ -41,6 +42,7 @@ Just Lofi - Relax Background Music For Videos - Lesfm
 A Pirate's Life - TommyMutiu
 Compromising Solo Guitars Ambient Hip Hop - Nesrality
 Foxes Attack - MokuseiNoMaguro
+Honor and Sword (Main)- ZakharValaha
 
 Engine:
 RPG Maker MV - Kadokawa

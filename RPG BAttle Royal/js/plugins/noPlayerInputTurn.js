@@ -12,7 +12,7 @@
 
 	(function(alias) {
 		Game_Player.prototype.executeMove = function(d) {
-			noTurn = true;
+			noTurn = Input.isControllerConnected();
 			alias.call(this, d);
 		};
 	})(Game_Player.prototype.executeMove);

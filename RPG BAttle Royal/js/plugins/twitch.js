@@ -1,4 +1,5 @@
 $starttwitch=function(){
+	document.getElementById("playerindicator").style.visibility="hidden"
 	var keyconfig_alias = Scene_Map.prototype.updateScene;
 	Scene_Map.prototype.updateScene = function() {
 	keyconfig_alias.call(this);
