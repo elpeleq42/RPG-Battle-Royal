@@ -304,10 +304,10 @@ window.chatHistory = [];
        }
      }
      //Toggle Chat Windows On/Off
-     if (Input.isTriggered('chat') && chatopen===false && localStorage.hidechat==false){
+     if (Input.isTriggered('chat') && chatopen===false && localStorage.hidechat=='false'){
        this.toggleChat();
      }
-      if ((escpressed===true||Input.isTriggered('chatsend')) && chatopen===true && localStorage.hidechat==false){
+      if ((escpressed===true||Input.isTriggered('chatsend')) && chatopen===true && localStorage.hidechat=='false'){
       escpressed=false
        this.toggleChat();
        
@@ -318,7 +318,7 @@ window.chatHistory = [];
    networkName=localStorage.myname || "Player"
      var value = document.getElementById('chatInput').value;
      value = value.trim();
-     if (value==='') return;
+     if (value==='' || ($gameMap._mapId!=1 && $gameMap._mapId!=6 && $gameMap._mapId!=7 && $gameMap._mapId!=5) ) return;
      if(value=="/kill"){
       $gameParty.members().forEach( function(actor) { actor.setHp(1) } );
       return

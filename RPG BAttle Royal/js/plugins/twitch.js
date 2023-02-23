@@ -69,7 +69,7 @@ $starttwitch=function(){
 	}
 	countdown(timeforinvasion)
 	
-	setTimeout($randomevent,getRandomInt(20000,30000))
+	setTimeout($randomevent,getRandomInt(60000,90000))
 	
 	client.on('message', (channel, tags, message, self) => {
 		if($timetochooserandomevent==true){
@@ -200,17 +200,17 @@ function $randomevent(){
 				AudioManager.playSe({ name: "Applause1", volume: 30, pitch: 90, pan: 0 } );
 				$gameParty.gainGold(getRandomInt(100,200));
 				$gameMessage.add("Correct!\\|\\.\\^")
-				setTimeout(()=>{$gamePlayer.reserveTransfer($gameMap.mapId(),55,51,2,1);},2000)
+				setTimeout(()=>{$gamePlayer.locate(55,51);},2000)
 			}else if($gamePlayer._x>55 && no>yes){
 				AudioManager.playSe({ name: "Applause1", volume: 30, pitch: 90, pan: 0 } );
 				$gameParty.gainGold(getRandomInt(100,200));
 				$gameMessage.add("Correct!\\|\\.\\^")
-				setTimeout(()=>{$gamePlayer.reserveTransfer($gameMap.mapId(),55,51,2,1);},2000)
+				setTimeout(()=>{$gamePlayer.locate(55,51);},2000)
 			}else{
 				AudioManager.playSe({ name: "Damage3", volume: 30, pitch: 90, pan: 0 } );
 				$gameParty.members()[0].gainHp(-20)
 				$gameMessage.add("Wrong!\\|\\.\\^")
-				setTimeout(()=>{$gamePlayer.reserveTransfer($gameMap.mapId(),55,51,2,1);},2000)
+				setTimeout(()=>{$gamePlayer.locate(55,51);},2000)
 			}
 		},8000)
 
@@ -221,9 +221,9 @@ function $randomevent(){
 		}else{
 			setTimeout(()=>{
 				$gameMessage.add("Congrats! You seem to know chat very well\\|\\|\\|\\.\\^")
-				setTimeout($randomevent,getRandomInt(20000,30000))
+				setTimeout($randomevent,getRandomInt(60000,90000))
 				setTimeout(() => {
-					$gamePlayer.reserveTransfer($gameMap.mapId(),24,16,2,1);
+					$gamePlayer.locate(24,16);
 					AudioManager.playBgs( { name: "just-relax-11157", volume: 30, pitch: 100, pan: 0 } );
 				}, 3000);
 			},11000)
@@ -252,17 +252,17 @@ function $randomevent(){
 		if(randomevent==1){
 			$gameMessage.add("Move or die\\|\\|\\^")
 			setTimeout(() => {
-				$gamePlayer.reserveTransfer($gameMap.mapId(),59,12,2,1);
+				$gamePlayer.locate(59,12);
 				setTimeout(()=>{
 					runaway=setInterval(()=>{
 						Yanfly.SpawnEventAt1(2, 42, $gamePlayer._x, $gamePlayer._y, true, "","")
 					},500)
 					setTimeout(()=>{
 						clearTimeout(runaway)
-						$gamePlayer.reserveTransfer($gameMap.mapId(),24,16,2,1);
+						$gamePlayer.locate(24,16);
 						$gameParty.gainGold(getRandomInt(200,300));
 						$gameMessage.add("Congrats! You survived!\\|\\|\\This time..|\\ \\^")
-						setTimeout($randomevent,getRandomInt(20000,30000))
+						setTimeout($randomevent,getRandomInt(60000,90000))
 					},20000)
 				},1500)
 			}, 2000);
@@ -277,9 +277,9 @@ function $randomevent(){
 				document.getElementById('playerindicator').style.visibility="hidden"
 
 				if(getRandomInt(1,4)<3){
-					$gamePlayer.reserveTransfer($gameMap.mapId(),4,42,2,1);
+					$gamePlayer.locate(4,42);
 				}else{
-					$gamePlayer.reserveTransfer($gameMap.mapId(),9,54,2,1);
+					$gamePlayer.locate(9,54);
 				}
 				$gameTimer.start(3600)
 				window.lab=setTimeout(()=>{
@@ -293,7 +293,7 @@ function $randomevent(){
 			
 			$gameMessage.add("Lets see if you know your chat\\|\\|\\^")
 			setTimeout(()=>{
-				$gamePlayer.reserveTransfer($gameMap.mapId(),55,51,2,1);
+				$gamePlayer.locate(55,51);
 				
 				setTimeout(()=>{
 					AudioManager.fadeOutBgs(1);
@@ -308,15 +308,9 @@ function $randomevent(){
 				Yanfly.SpawnEventAt(2,45, 97, 8, true, `BigBadBoss`)
 				
 				
-				setTimeout((a)=>{
-					$gameMap.eraseEvent(a)
-					$gamePlayer.reserveTransfer($gameMap.mapId(),24,16,2,1);
-					AudioManager.stopSe();
-					AudioManager.playBgs( { name: "just-relax-11157", volume: 30, pitch: 100, pan: 0 } );
-					setTimeout($randomevent,getRandomInt(20000,30000))
-				},40000,$gameMap._events.length-1)
 				
-				$gamePlayer.reserveTransfer($gameMap.mapId(),97,14,2,1);
+				
+				$gamePlayer.locate(97,14);
 				AudioManager.fadeOutBgs(1);
 				AudioManager.playSe({ name: "chasing-victory-main-9448", volume: 30, pitch: 90, pan: 0 } );
 				$gameTimer.start(2400)
@@ -330,14 +324,16 @@ function $randomevent(){
 				
 				
 				window.waitchecker=setTimeout((a)=>{
+					$gameMessage.add("You survived!\\|\\|\\^")
 					$gameMap.eraseEvent(a)
-					$gamePlayer.reserveTransfer($gameMap.mapId(),24,16,2,1);
-					AudioManager.stopSe();
+					$gamePlayer.locate(24,16);
+					AudioManager.fadeOutBgs(1);
+					clearInterval(kongcheck)
 					AudioManager.playBgs( { name: "just-relax-11157", volume: 30, pitch: 100, pan: 0 } );
-					setTimeout($randomevent,getRandomInt(20000,30000))
+					setTimeout($randomevent,getRandomInt(60000,90000))
 				},40000,$gameMap._events.length-1)
 				
-				$gamePlayer.reserveTransfer($gameMap.mapId(),104,57,2,1);
+				$gamePlayer.locate(104,57);
 				AudioManager.playSe({ name: "chasing-victory-main-9448", volume: 30, pitch: 90, pan: 0 } );
 				$gameTimer.start(2400)
 				
@@ -349,6 +345,5 @@ function $randomevent(){
 	
 }
 $timetochooserandomevent=false
-
 
 

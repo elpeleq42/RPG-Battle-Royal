@@ -1,18 +1,8 @@
-Changes:
-
 Client:
--New $gameMap.eventServerId(id) function that returns an event with a given server ID
--New Tutorials for Tower Defense and VS Twitch Maps
--New buildings for Tower Defense: Explosive and Balloon
--Player no longer changes to a random character once pressing the lever on Tower Defense
--CRT Mode changed from being default ON to default OFF(can be turned on in options)
--Enemies in tower defense now can walk through one another
-
-Server:
--New moveObject(id,x,y) and getObjectInfo(id) functions
-
-Optimizations:
+Changes:
+-VS Twitch random events now happen once every 1min to 1min30s
+-Moved updates back to github temporarily, due to issues
 
 Fixes:
--Fixed red dot on the top right showing on twitch and tower defenses
--Fixed bank(in tower defense) not having an animation
+
+Server:

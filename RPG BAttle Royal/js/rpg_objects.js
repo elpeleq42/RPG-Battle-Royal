@@ -5676,11 +5676,11 @@ Game_Map.prototype.data = function() {
 };
 
 Game_Map.prototype.isLoopHorizontal = function() {
-    return $dataMap.scrollType === 2 || $dataMap.scrollType === 3;
+    if($dataMap) return $dataMap.scrollType === 2 || $dataMap.scrollType === 3;
 };
 
 Game_Map.prototype.isLoopVertical = function() {
-    return $dataMap.scrollType === 1 || $dataMap.scrollType === 3;
+    if($dataMap) return $dataMap.scrollType === 1 || $dataMap.scrollType === 3;
 };
 
 Game_Map.prototype.isDashDisabled = function() {

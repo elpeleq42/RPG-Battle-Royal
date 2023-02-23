@@ -274,7 +274,8 @@ Game_Interpreter.prototype.command117 = function() {
 window.playerdead=false
 
 
-setInterval(()=>{
+function playerdirect(){
+  if(!$gamePlayer) return
     if(Math.abs(TouchInput._x-$gamePlayer.screenX())>Math.abs(TouchInput._y-$gamePlayer.screenY())){
         if($gamePlayer.screenX()>TouchInput._x>0){
           
@@ -292,7 +293,8 @@ setInterval(()=>{
             $gamePlayer.setDirection(8)
         }
     }
-},33)
+}
+setInterval(playerdirect,16)
 
 
 Game_Temp.prototype.setDestination = function(x, y) {
@@ -720,8 +722,7 @@ serverjoin=function() {
       }
 
       
-
-$gameMap.eventServerId=function(id){
+if($gameMap) $gameMap.eventServerId=function(id){
   var current
   for(var i=$gameMap._events.length;i--;){
     current=$gameMap._events[i]

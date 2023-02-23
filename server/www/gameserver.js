@@ -734,6 +734,24 @@ try{
 						},`+Number(str2[2])+`)`)
 					}
 					})
+				}else if(str2=="rank"){
+					var temp1=[]
+
+					for(var g=server.connections.length;g--;){
+						temp1.push([server.connections[g].playername,server.connections[g].killcount])
+					}
+
+					temp1 = temp1.sort(function(a, b) {
+						return b[1] - a[1];
+					});
+					broadcast("chat:Ranks")
+
+					for(var g=10;g--;){
+						if(!temp1[g]) continue
+						broadcast("chat:"+g+":"+temp1[g][0]+" - "+temp1[g][1]+" kills")
+					}
+
+					
 				}
 				else if(connection.muted!==true && connection.playerid!==null && (str2.startsWith("/"))==false){
 					broadcast("chat:"+connection.playername+":"+str2)

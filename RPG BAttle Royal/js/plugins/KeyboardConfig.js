@@ -900,12 +900,12 @@ Window_KeyAction.prototype.makeCommandList = function() {
 	this.addCommand(Yanfly.Param.KeyConfigOkTx, 'ok', true, 'ok');
 	this.addCommand(Yanfly.Param.KeyConfigEscTx, 'ok', true, 'escape');
 	this.addCommand(Yanfly.Param.KeyConfigCancelTx, 'ok', true, 'cancel');
+	this.addCommand(Yanfly.Param.KeyConfigChat, 'ok', true, 'chat');
+	this.addCommand(Yanfly.Param.KeyConfigSendChat, 'ok', true, 'chatsend');
 	this.addCommand(Yanfly.Param.KeyConfigWeapon, 'ok', true, 'weapon');
 	this.addCommand(Yanfly.Param.KeyConfigShield, 'ok', true, 'shield');
 	this.addCommand(Yanfly.Param.KeyConfigPotion, 'ok', true, 'potion');
 	this.addCommand(Yanfly.Param.KeyConfigdrop, 'ok', true, 'drop');
-	this.addCommand(Yanfly.Param.KeyConfigDropShield, 'ok', true, 'dropmelee');
-	this.addCommand(Yanfly.Param.KeyConfigDropPotion, 'ok', true, 'droppotion');
     this.addCommand(Yanfly.Param.KeyConfigFlashlightKey, 'ok', true, 'lantern');
 	this.addCommand(Yanfly.Param.KeyConfigMenuTx, 'ok', true, 'menu');
     this.addCommand(Yanfly.Param.KeyConfigstatus, 'ok', true, 'tab');
