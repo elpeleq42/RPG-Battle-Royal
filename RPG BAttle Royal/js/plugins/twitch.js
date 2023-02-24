@@ -14,7 +14,9 @@ $starttwitch=function(){
 	}
 
 	}
+	window.viewerlist=["BigBadCreature"]
 	window.timeforinvasion=60
+	window.healtimer=0;
 	window.move=0
 	window.questions=0
 	window.thelab=0
@@ -70,8 +72,21 @@ $starttwitch=function(){
 	countdown(timeforinvasion)
 	
 	setTimeout($randomevent,getRandomInt(60000,90000))
+	setInterval(() => {
+		$gameMessage.add("Oh no, monsters are invading\\|\\|\\.\\^")
+		timeforinvasion=60
+		Yanfly.SpawnEventAt(2,44, 0, 9, true, viewerlist[getRandomInt(0,viewerlist.length-1)])
+		Yanfly.SpawnEventAt(2,44, 25, 5, true, viewerlist[getRandomInt(0,viewerlist.length-1)])
+		Yanfly.SpawnEventAt(2,44, 14, 24, true, viewerlist[getRandomInt(0,viewerlist.length-1)])
+		Yanfly.SpawnEventAt(2,44, 34, 17, true, viewerlist[getRandomInt(0,viewerlist.length-1)])
+
+		$gameMap.event(1000+lastspawnedabove100).HP=7
+	},getRandomInt(120000,125000) );
 	
 	client.on('message', (channel, tags, message, self) => {
+		
+		if(!viewerlist.includes(`${tags['display-name']}`)) viewerlist.push(`${tags['display-name']}`)
+
 		if($timetochooserandomevent==true){
 			if(message.toLowerCase()=="!move"){
 				move++
@@ -85,6 +100,13 @@ $starttwitch=function(){
 				kong++
 			}
 		}
+		if((message.toLowerCase()=="heal" || message.toLowerCase()=="!heal") && healtimer==0){
+			healtimer=30
+			$gameParty.members()[0].gainHp(50)
+			setTimeout(() => {
+				healtimer=0
+			}, 30000);
+		}
 		if($timetochooserandomevent==false && timeforinvasion<1){
 			if(message.toLowerCase()=="!invade"){
 				timeforinvasion=60
@@ -93,9 +115,9 @@ $starttwitch=function(){
 				
 			} 
 		}
-		if(message.toLowerCase()=="!yes"){
+		if(message.toLowerCase()=="!yes" || message.toLowerCase()=="yes"){
 			yes++
-		}else if(message.toLowerCase()=="!no"){
+		}else if(message.toLowerCase()=="!no" || message.toLowerCase()=="no"){
 			no++
 		}
 
