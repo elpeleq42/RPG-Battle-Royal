@@ -6,5 +6,5 @@ Changes:
 -Answering just "yes" or "no" now also work on VS Twitch
 
 Added:
--Added random invasions to VS Twitch! Multiple monsters will spawn at random every around 2 minutes
+-Added random invasions to VS Twitch! Multiple monsters will spawn at random every 2 or so minutes
 -Added command to heal player in VS Twitch! Viewers can type "heal" in chat once very 30 seconds to heal the player by 50 HP
