@@ -1,0 +1,11 @@
+-New servers up!
+
+Client:
+Battle Royal map:
+-Minor changes to it, for balancing
+
+VS Twitch:
+-Any message with over 100 bits will summon an enemy in game
+
+Fixes:
+-If nothing is selected, or an error happens during map load on offline gameplay, the game will now simply reload instead of being stuck on an empty screen.
