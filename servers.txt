@@ -1,1 +1,4 @@
 local - ws://localhost:1000
+Zombies - ws://peq42.kinghost.net:21092
+Free4All - ws://peq42.kinghost.net:21093
+BattleRoyal - ws://peq42.kinghost.net:21084
