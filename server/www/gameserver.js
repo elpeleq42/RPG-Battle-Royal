@@ -7,18 +7,18 @@ try{
 	
 	var mxplayers,adminpassword,servportnumb,initgold,upspeed,servpass,servmap
 	
-	//Server configs://////////////////////////////////
-	const maxnumberofplayers=mxplayers || 100		// Up to 1000
-	const admpassword=adminpassword || null   //
-	const serverPort=servportnumb || 1000  		  //
-	const initialgold=initgold || 0    			 //
-	const upspeedmap=upspeed || 0	  			//
-	var serverpass=servpass || null	   //
-	var map=servmap	|| "default"			  // default, free4all, a link or full file path
-	const tickrate=30            			 // Between 1 and 1000
-	const maxafktime=120                    // Above 0, in seconds
-	const maxkills=25                      //above 0, amount of kills before reset on free for all
-	////////////////////////////////////////
+//Server configs://////////////////////////////////
+const maxnumberofplayers=mxplayers || 100		// Up to 1000
+const admpassword=adminpassword || null   //
+const serverPort=servportnumb || 1000  		  //
+const initialgold=initgold || 0    			 //
+const upspeedmap=upspeed || 0	  			//
+var serverpass=servpass || null	   //
+var map=servmap	|| "default"			  // default, free4all, a link or full file path
+const tickrate=30            			 // Between 1 and 1000
+const maxafktime=120                    // Above 0, in seconds
+const maxkills=25                      //above 0, amount of kills before reset on free for all
+////////////////////////////////////////
 	
 	
 	
@@ -184,6 +184,17 @@ try{
 	
 				server.connections[i]._sendText("password:"+msg)
 				server.connections[i]._sendText("id:"+server.connections[i].playerid)
+
+				numberofplayers++
+				if(numberofplayers>1 && serverlock===false && map=="default" ){
+					begingame()
+				}
+				if(numberofplayers>1 && map=="free4all"){
+					begingamefree4all()
+				}
+				if(numberofplayers>2 && map=="zombies" && serverlock===false ){
+					begingamezombies()
+				}
 			}
 	
 		}
@@ -348,7 +359,6 @@ try{
 	
 				playernames[connection.playerid]=name
 	
-				numberofplayers++
 	
 				playersalive++
 	
@@ -374,15 +384,7 @@ try{
 				
 				broadcast("eventid:"+connection.playerid)
 				connection.todo.push("receivegold:"+initialgold)
-				if(numberofplayers>1 && serverlock===false && map=="default" ){
-					begingame()
-				}
-				if(numberofplayers>1 && map=="free4all"){
-					begingamefree4all()
-				}
-				if(numberofplayers>2 && map=="zombies" && serverlock===false ){
-					begingamezombies()
-				}
+				
 				if(serverlock===true &&( map==="default" || map==="zombies")){
 					connection.todo.push("roundstarted")
 					broadcast("spawn:"+(connection.playerid+1000)+":"+connection.playername+":m")
@@ -650,6 +652,7 @@ try{
 						connection.adm=true
 						connection.todo.push("chat::You're now admin!")
 					}
+					str2=""
 				}if(str2.startsWith("/w") || str2.startsWith("/whisper")){
 
 					for(var i=server.connections.length;i--;){
@@ -658,6 +661,7 @@ try{
 							break
 						}
 					}
+					str2=""
 				}
 				else if(str2.startsWith("/list") || str2.startsWith("/playerlist")){
 					server.connections.forEach(function (connectionn) {
@@ -666,6 +670,7 @@ try{
 						}
 	
 					})
+					str2=""
 				}else if(str2.startsWith("/commands")){
 					connection.todo.push(`chat::/kick
 					/ban
@@ -1151,7 +1156,9 @@ try{
 			}
 		}
 		broadcast("gamewillbegin")
-		setTimeout(broadcast("begin"),3000)
+		setTimeout(()=>{
+			broadcast("begin")
+		},3000)
 	
 	}
 
