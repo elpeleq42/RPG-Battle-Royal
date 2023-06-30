@@ -6,6 +6,7 @@ window.weapondelay=0
 window.server=function(){}
 worker=false
 window.serverpass=false
+window.finallist=[]
 
 
 var fs=require("fs")
@@ -33,6 +34,9 @@ if(!localStorage.twitchname){
 }
 if(!localStorage.hidechat){
   localStorage.hidechat=false
+}
+if(!localStorage.reconnect){
+  localStorage.reconnect=""
 }
 
 if(localStorage.hidechat==true){

@@ -9,16 +9,20 @@ try{
 	
 //Server configs://////////////////////////////////
 const maxnumberofplayers=mxplayers || 100		// Up to 1000
-const admpassword=adminpassword || null   //
+const admpassword=adminpassword || null   	   //
 const serverPort=servportnumb || 1000  		  //
 const initialgold=initgold || 0    			 //
 const upspeedmap=upspeed || 0	  			//
 var serverpass=servpass || null	   //
-var map=servmap	|| "default"			  // default, free4all, a link or full file path
+var map=servmap	|| "default"			  // default, free4all, zombies, a link or full file path
 const tickrate=30            			 // Between 1 and 1000
 const maxafktime=120                    // Above 0, in seconds
 const maxkills=25                      //above 0, amount of kills before reset on free for all
-////////////////////////////////////////
+const mapvote=false                   //true if users are allowed to vote for map change
+const mapvotetime=600                 //time in seconds between map votes
+const mapnames=["Battle Royal", "Free for All", "Zombies"]//list of map names, must be in the same order as below
+const maplinks=["default","free4all","zombies"]//full links and/or filepaths
+///////////////////////////////////////
 	
 	
 	
@@ -28,39 +32,44 @@ const maxkills=25                      //above 0, amount of kills before reset o
 	const crypt = require('crypto')
 	const fs   = require('fs')
 	var nonmovable= objects= checkobjs= tobeuploaded= banlist=[]
-	var playercounter= new Uint8Array(1001)
+	var playercounter= new Array(1001)
 	var playernames = new Array(1001).fill("")
 	var serverlock=reseting=false
 	var checkendgame,temp,disconnectthis
+	var counttimetilmapvote=mapvotetime
 	var objectcounter= highestid=playersalive=numberofplayers=giveID=0
 	var timelapse= arrbuffer=null
 	var sentries=[]
+	var mapvotes=[]
 	
 	
 	
-	if(map!=="default" && map!=="zombies" && map!=="free4all" && !(map.startsWith("http"))){
-		var map = fs.readFileSync(servmap);
-		if(upspeedmap!=0){
+	function LoadMapToRAM(){
+		if(map!=="default" && map!=="zombies" && map!=="free4all" && !(map.startsWith("http"))){
+			map = fs.readFileSync(servmap);
+			if(upspeedmap!=0){
+		
 	
-
-	
-			breakup=Math.ceil(map.length/(204800*upspeedmap))
-			forsize=Math.ceil(map.length/breakup)
-			arrbuffer=new Array(breakup)
-			for(var i=breakup;i--;){
-				arrbuffer[i]=Buffer.allocUnsafe(forsize)
-				map.copy(arrbuffer[i],0,i*forsize,(i+1)*forsize)
+		
+				breakup=Math.ceil(map.length/(204800*upspeedmap))
+				forsize=Math.ceil(map.length/breakup)
+				arrbuffer=new Array(breakup)
+				for(var i=breakup;i--;){
+					arrbuffer[i]=Buffer.allocUnsafe(forsize)
+					map.copy(arrbuffer[i],0,i*forsize,(i+1)*forsize)
+				}
+				map="filecustom"
+		
+		
+			}else{
+				buffer=map.toString('binary')
+				map="filecustom"
+				
 			}
-			map="filecustom"
-	
-	
-		}else{
-			buffer=map.toString('binary')
-			map="filecustom"
-			
 		}
+		servmap=undefined
 	}
-	servmap=undefined
+	LoadMapToRAM()
 	
 		function map_upload_process(_tobindex,time){
 			tobindex=_tobindex
@@ -185,6 +194,8 @@ const maxkills=25                      //above 0, amount of kills before reset o
 				server.connections[i]._sendText("password:"+msg)
 				server.connections[i]._sendText("id:"+server.connections[i].playerid)
 
+
+				
 				numberofplayers++
 				if(numberofplayers>1 && serverlock===false && map=="default" ){
 					begingame()
@@ -212,6 +223,7 @@ const maxkills=25                      //above 0, amount of kills before reset o
 			}
 		}
 		function cancel_binary(){
+			console.log("Connection tried to upload file and got kicked")
 			connection.close()
 			return
 		}
@@ -237,6 +249,7 @@ const maxkills=25                      //above 0, amount of kills before reset o
 		connection.todo=[]
 		connection.afkcount=0
 		connection.killcount=0
+		connection.hasvoted=false
 		if(serverpass!==null){
 			connection.sentpass=false
 		}
@@ -246,7 +259,10 @@ const maxkills=25                      //above 0, amount of kills before reset o
 			
 			
 			connection.postMessage++
-			if(connection.postMessage>50) connection.close()
+			if(connection.postMessage>50) {
+				console.log(connection.playername+" has been kicked for sending too many messages per second")
+				connection.close()
+			}
 	
 			if(str=='undefined'){
 				return
@@ -256,7 +272,10 @@ const maxkills=25                      //above 0, amount of kills before reset o
 				var decrypted = Buffer.concat([decipher.update(Buffer.from(str,"binary")), decipher.final()]).toString();
 				str1=decrypted
 			}else{
-				if(connection.postMessage>5) connection.close()
+				if(connection.postMessage>5) {
+					console.log("A connection has tried to send over 5 messages per second before identification")
+					connection.close()
+				}
 				str1=str
 			}
 			if(str1.indexOf("&&")>-1){
@@ -281,7 +300,7 @@ const maxkills=25                      //above 0, amount of kills before reset o
 				}
 	
 				if(arrbuffer!=null){
-					connection.tempID=getRandomInt(0,9999999)
+					connection.tempID=getRandomInt(0,99999999)
 					tobeuploaded.push([connection.tempID,0])
 
 					if(tobeuploaded.length==1) mapupload(0,500)
@@ -296,7 +315,7 @@ const maxkills=25                      //above 0, amount of kills before reset o
 				
 			}else if(str==serverpass){
 				if(arrbuffer!=null){
-					connection.tempID=getRandomInt(0,9999999)
+					connection.tempID=getRandomInt(0,99999999)
 					tobeuploaded.push([connection.tempID,0])
 
 					if(tobeuploaded.length==1) mapupload(0,500)
@@ -380,6 +399,7 @@ const maxkills=25                      //above 0, amount of kills before reset o
 	
 				broadcast("spawn:"+(1000+connection.playerid)+":"+connection.playername)
 				
+				console.log("User:"+name+" ID:"+connection.playerid+" has joined the server")
 				broadcast("chat::"+name+" has joined.")
 				
 				broadcast("eventid:"+connection.playerid)
@@ -396,7 +416,11 @@ const maxkills=25                      //above 0, amount of kills before reset o
 			}
 			else if(str1.startsWith("arrow")){
 				var str2=str1.split(":")
-				if(Math.abs(str2[1]-connection.x)>2 || Math.abs(str2[2]-connection.y)>2) {connection.close();return}
+				if(Math.abs(str2[1]-connection.x)>2 || Math.abs(str2[2]-connection.y)>2) {
+					console.log(connection.playername+" spawned an arrow in suspicious location")
+					connection.close();
+					return
+				}
 				broadcast(str1)
 			}
 			else if(str1.startsWith("build")){
@@ -447,7 +471,11 @@ const maxkills=25                      //above 0, amount of kills before reset o
 			else if(str1.startsWith("magic")){
 				connection.msgcounter+=5
 				var str2=str1.split(":")
-				if(Math.abs(str2[1]-connection.x)>2 || Math.abs(str2[2]-connection.y)>2) {connection.close();return}
+				if(Math.abs(str2[1]-connection.x)>2 || Math.abs(str2[2]-connection.y)>2) {
+					console.log(connection.playername+" spawned an magic missile in suspicious location")
+					connection.close();
+					return
+				}
 				broadcast(str1)
 			}
 			else if(str1.startsWith("chest")){
@@ -458,7 +486,11 @@ const maxkills=25                      //above 0, amount of kills before reset o
 				objectcounter++
 			}
 			else if(str1.startsWith("flashlight")){
-				if((connection.playerid+1000)!=str1.split(":")[1]){connection.close();return}
+				if((connection.playerid+1000)!=str1.split(":")[1]){
+					console.log(connection.playername+" has tried to turn someone else's flashlight on")
+					connection.close();
+					return
+				}
 				broadcast(str1)
 			}
 	
@@ -641,11 +673,14 @@ const maxkills=25                      //above 0, amount of kills before reset o
 				
 			}
 			else if(str1.startsWith("chat:")){
+				
 				connection.afkcount=0
 				connection.msgcounter+=5
 				var str2=str1.split(":")
 				str2=str2.splice(1,str2.length)
 				str2=str2.join(":")
+
+				console.log("chat message: "+str2)
 				if(str2.startsWith("/adm")){
 					str2=str2.split(" ").splice(1,str2.length).join(" ")
 					if(admpassword!==null && str2==admpassword){
@@ -686,6 +721,7 @@ const maxkills=25                      //above 0, amount of kills before reset o
 					for(var i=server.connections.length;i--;){
 						if(server.connections[i].playerid==str2[1]){
 							broadcast("chat::>"+server.connections[i].playername+" has been kicked.")
+							console.log(server.connections[i].playername+" has been kicked.")
 							server.connections[i].close()
 							break
 						}
@@ -698,6 +734,7 @@ const maxkills=25                      //above 0, amount of kills before reset o
 						if(server.connections[i].playerid==str2[1]){
 							broadcast("chat::>"+server.connections[i].playername+" has been banned.")
 							server.connections[i].close()
+							console.log(server.connections[i].playername+" has been banned.")
 							banlist.push([server.connections[i].playerip,server.connections[i].headers.origin.split("//")[1]])
 							break
 						}
@@ -757,6 +794,46 @@ const maxkills=25                      //above 0, amount of kills before reset o
 					}
 
 					
+				}else if(str2=="/votemap" && mapvote==true && counttimetilmapvote==0){
+					broadcast("chat:Vote for a map using /vote MAPID!")
+					for (let ii = 0; ii < mapnames.length; ii++) {
+						broadcast("chat:"+ii+":"+mapnames[ii])
+						
+					}
+					
+				}
+				else if(str2.startsWith("/vote")){
+					if(connection.hasvoted==true) return
+					connection.hasvoted=true;
+					str2=str2.split(" ")[1]
+					if(Number(str2)>=maplinks.length) return
+					mapvotes.push(str2)
+					if(mapvotes.length>(server.connections.length/3)){
+						function mode(array)
+						{
+							if(array.length == 0)
+								return null;
+							var modeMap = {};
+							var maxEl = array[0], maxCount = 1;
+							for(var i = 0; i < array.length; i++)
+							{
+								var el = array[i];
+								if(modeMap[el] == null)
+									modeMap[el] = 1;
+								else
+									modeMap[el]++;  
+								if(modeMap[el] > maxCount)
+								{
+									maxEl = el;
+									maxCount = modeMap[el];
+								}
+							}
+							return maxEl;
+						}
+						map=maplinks[mode(mapvotes)]
+						LoadMapToRAM()
+						broadcast("rejoin")
+					}
 				}
 				else if(connection.muted!==true && connection.playerid!==null && (str2.startsWith("/"))==false){
 					broadcast("chat:"+connection.playername+":"+str2)
@@ -1069,9 +1146,12 @@ const maxkills=25                      //above 0, amount of kills before reset o
 	
 	setInterval(()=>{
 		for (var i = server.connections.length - 1; i >= 0; i--) {
+			if(counttimetilmapvote>0)counttimetilmapvote--;
+
 			server.connections[i].afkcount++
 			if(server.connections[i].afkcount>maxafktime){
 				server.connections[i].close()
+				console.log(server.connections[i].playername+" has been kicked for being afk.")
 			}
 		}
 	},1000)

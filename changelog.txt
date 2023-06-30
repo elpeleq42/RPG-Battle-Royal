@@ -1,6 +1,4 @@
 Server>
--Fixed issue where passwords, whispers, etc would show in global chat
--Fixed error causing Free4All server to immediately disconnect
-
-Client>
--Improved Multiplayer synchronization between players
+-Added logging to multiple important actions in the server
+-Added Map Voting(Will kick all players and force their client to re-join the server once the map is loaded)
+-Fixed incorrect use of 8bit typed array for playercounter

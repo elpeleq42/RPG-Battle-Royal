@@ -114,6 +114,12 @@ self.onmessage = function(e) {
 						}
 						arrayofpositions.push(update[i])
 						self.postMessage(update[i])
+					}else if(update[i]=="rejoin"){
+						
+						connection.close()
+						self.postMessage("reconnect;;"+ip)
+						self.postMessage("closed")
+
 					}else{
 						self.postMessage(update[i])
 					}
@@ -158,6 +164,12 @@ self.onmessage = function(e) {
 					}
 					arrayofpositions.push(update)
 					self.postMessage(update)
+				}else if(update=="rejoin"){
+					console.log('here')
+					connection.close()
+					self.postMessage("reconnect;;"+ip)
+					self.postMessage("closed")
+
 				}else{
 					self.postMessage(update)
 				}

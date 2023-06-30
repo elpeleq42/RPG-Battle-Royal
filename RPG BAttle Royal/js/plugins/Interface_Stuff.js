@@ -294,7 +294,7 @@ var fs=require("fs")
 
 function updater(){
   document.getElementById('updatetext').innerHTML=`<a href="javascript: void(0)" style="color:white;">Downloading...</a>`
-  download("https://peq42.com/downloads/RPGModmaster.zip","./master.zip",function(){
+  download("https://codeload.github.com/peq42/RPG-Battle-Royal/zip/refs/heads/master","./master.zip",function(){
     document.getElementById('updatetext').innerHTML=`<a href="javascript: void(0)" style="color:white;">Extracting...</a>`
     var AdmZip = require('./js/plugins/adm-zip.js');
 
@@ -339,7 +339,7 @@ Scene_Map.prototype.createupdatetext = function(){
   document.body.appendChild(this.updatetext)
   Graphics._centerElement(this.updatetext);
   const fs=require("fs")
-  download("https://peq42.com/downloads/version.txt", "./checker.txt",function(){
+  download("https://raw.githubusercontent.com/peq42/RPG-Battle-Royal/master/version.txt", "./checker.txt",function(){
     if(fs.readFileSync('./checker.txt',{encoding:'utf8', flag:'r'})!==fs.readFileSync('./www/version.txt',{encoding:'utf8', flag:'r'})){
       document.getElementById('updatetext').innerHTML=`<a href="javascript: void(0)" style="color:white;" onclick="updater()">Update Available. Click here to update</a>`
     }else{

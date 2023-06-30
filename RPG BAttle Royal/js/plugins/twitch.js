@@ -82,6 +82,15 @@ $starttwitch=function(){
 
 		$gameMap.event(1000+lastspawnedabove100).HP=7
 	},getRandomInt(120000,125000) );
+
+	client.on('cheer', (channel, userstate, message) => {
+		const username = userstate['display-name'];
+		const bits = userstate.bits;
+		if(bits<100) return
+	  
+		Yanfly.SpawnEventAt(2,44, 0, 9, true, username)
+		$gameMap.event(1000+lastspawnedabove100).HP=7
+	});
 	
 	client.on('message', (channel, tags, message, self) => {
 		
