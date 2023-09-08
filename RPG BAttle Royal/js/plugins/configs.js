@@ -736,3 +736,19 @@ if($gameMap) $gameMap.eventServerId=function(id){
   }
 
 }
+
+
+function $copyEvent(id,thiseventid){
+  if($gameMap._events[id]){
+    var gamemaptemp=$gameMap._events[thiseventid]
+    var datamaptemp=$dataMap.events[thiseventid]
+
+    $gameMap._events[thiseventid]=$gameMap._events[id]
+    $dataMap.events[thiseventid]=$dataMap.events[id]
+
+    $gameMap._events[thiseventid].serverID=gamemaptemp.serverID
+
+    
+    
+  }
+}

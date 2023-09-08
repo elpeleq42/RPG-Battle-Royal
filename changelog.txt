@@ -1,4 +1,10 @@
-Server>
--Added logging to multiple important actions in the server
--Added Map Voting(Will kick all players and force their client to re-join the server once the map is loaded)
--Fixed incorrect use of 8bit typed array for playercounter
+Client>
+-Updated NW.js to v0.79.1(Chromium 116, Node.js 20.5.1)
+-Changed IP Verification services to be hosted by my website
+-Added new $copyEvent function on the client. This allows creation of unlimited copies of an event present in the map, which should allow for more flexibility when creating custo maps/scripts.
+-Fixed wrong behavior when pressing "Escape" in the main menu
+-Fixed crash on certain linux systems
+-Security tweaks
+
+
+>You can create a copy of an event by calling the createObject() function in your server, and setting the "extra" parameter as "tocopy" and the following parameter as the ID of the event to be copied. The event created will be a carbon copy of the original, with exception of the serverID. >For singleplayer, call $copyEvent(id_to_copy,id_of_current_event)
