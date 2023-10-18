@@ -109,7 +109,7 @@ self.onmessage = function(e) {
 								
 								arrayofpositions[u]=update[i]
 								self.postMessage(update[i])
-								return
+								break
 							}
 						}
 						arrayofpositions.push(update[i])
@@ -159,13 +159,12 @@ self.onmessage = function(e) {
 						if(update.split(":")[1]==arrayofpositions[u].split(":")[1]){
 							arrayofpositions[u]=update
 							self.postMessage(update)
-							return
+							break
 						}
 					}
 					arrayofpositions.push(update)
 					self.postMessage(update)
 				}else if(update=="rejoin"){
-					console.log('here')
 					connection.close()
 					self.postMessage("reconnect;;"+ip)
 					self.postMessage("closed")

@@ -35,6 +35,7 @@ if(!localStorage.twitchname){
 if(!localStorage.hidechat){
   localStorage.hidechat=false
 }
+
 if(!localStorage.reconnect){
   localStorage.reconnect=""
 }
