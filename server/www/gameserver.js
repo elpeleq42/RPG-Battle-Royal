@@ -1378,6 +1378,7 @@ function begingamezombies() {
 
         broadcast("begin")
         broadcast('dead:' + (randomplayerid - 1000))
+        playersalive--
         timer = setTimeout(() => {
             if (playersalive > 0) {
                 broadcast("message:Humans win!\\|\\^")
@@ -1413,10 +1414,12 @@ function begingamezombies() {
 
     checkendgame = setInterval(() => {
         if (playersalive < 1) {
+            alreadystarted=false
             for (var i = server.connections.length; i--;) {
                 if (server.connections[i].alive == true) {
                     broadcast("message:" + server.connections[i].playername + ` has won!
 						Kill count:` + server.connections[i].killcount + "\\|\\^")
+                    broadcast("tpevent:33:30:"+server.connections[i].playerid)
                     break
                 }
             }

@@ -36,9 +36,6 @@ if(!localStorage.hidechat){
   localStorage.hidechat=false
 }
 
-if(!localStorage.canflash){
-  localStorage.canflash=true
-}
 
 if(!localStorage.reconnect){
   localStorage.reconnect=""
@@ -762,4 +759,20 @@ Game_Screen.prototype.startFlash = function(color, duration) {
   if(localStorage.canflash==false) return
   this._flashColor = color.clone();
   this._flashDuration = duration;
+};
+
+Game_Map.prototype.eventsXy = function(x, y) {
+  var events=this.events()
+  var result=[]
+  for(var i=events.length;i--;){
+      if(events[i]._x==x && events[i]._y==y) result.push(events[i])
+  }
+  
+  return result
+};
+
+Game_Event.prototype.erase = function() {
+  this._erased = true;
+  this.refresh();
+  setTimeout($eventpropereraser,5000,this._eventId)
 };
