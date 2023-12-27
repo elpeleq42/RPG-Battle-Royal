@@ -1,0 +1,84 @@
+<html>
+    
+<head></head>
+
+<style>
+    body{
+        background-color: black;
+        color: white;
+        font-size: 20px;
+        background: rgba(0, 0, 0, 0.5);
+    }
+    /* width */
+    ::-webkit-scrollbar {
+    width: 20px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+    }
+    
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+    background: #888; 
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+    }
+    .button{
+        word-spacing: 33vw;
+        border: transparent;
+        width: 100%;
+        font-size: 24px;
+        height: 32px;
+        background-color: #2e2e2e88;
+        color: white;
+    }
+    .top{
+        word-spacing: 33vw;
+        border: transparent;
+        width: 100%;
+        background-color: transparent;
+        color: white;
+    }
+    .button:hover{
+        background-color: #888;
+    }
+    .hr{
+        width: 90%;
+    }
+
+</style>
+
+<body>
+    <a onclick=""></a>
+    <center><span class="top" style="-webkit-user-select:none;">Servers Players Ping</span></center>
+    <hr class="hr">
+    <button style="-webkit-user-select:none; width: 48px;height: 48px;font-size: 24px; line-height: 18px;position: fixed;top: 10px;right: 10px;" onclick="window.parent.finallist=[];window.parent.AudioManager.playSe({ name: 'Equip1', volume: 25, pitch: 150, pan: 0 } );parent.$gameTemp.reserveCommonEvent(4,true);parent.document.getElementById('serverlist').remove();">X</button>
+    <br><br><br>
+    <div style="position: relative;
+    max-height: 90%;
+    overflow: auto;">
+    
+        <div id='serverlist' >
+            
+
+        </div>
+    </div>
+    <center><button style="width: 48px;-webkit-user-select:none;height: 48px;font-size: 24px; line-height: 18px;position: fixed;bottom: 10px;" onclick="window.parent.AudioManager.playSe({ name: 'Equip1', volume: 25, pitch: 150, pan: 0 } );document.getElementById('serverlist').innerHTML='';window.parent.stopchecking=false;window.parent.servertest(window.parent.servernames[0],window.parent.servers[0])">🗘</button></center>
+</body>
+<script>
+    parent.document.getElementById('serverlist').focus()
+    document.addEventListener('keydown', function(e) {
+        if(e.keyCode == 27){
+            window.parent.AudioManager.playSe({ name: 'Equip1', volume: 25, pitch: 150, pan: 0 } );
+            parent.$gameTemp.reserveCommonEvent(4,true);
+            parent.document.getElementById('serverlist').remove();
+        }
+    });
+</script>
+
+</html>

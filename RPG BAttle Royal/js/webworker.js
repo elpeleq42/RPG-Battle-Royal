@@ -107,8 +107,7 @@ self.onmessage = function(e) {
 						for(var u=arrayofpositions.length;u--;){
 							if(update[i].split(":")[1]==arrayofpositions[u].split(":")[1]){
 								
-								arrayofpositions[u]=update[i]
-								self.postMessage(update[i])
+								arrayofpositions.splice(u,1)
 								break
 							}
 						}
@@ -157,8 +156,7 @@ self.onmessage = function(e) {
 				}else if(update.startsWith("update")){
 					for(var u=arrayofpositions.length;u--;){
 						if(update.split(":")[1]==arrayofpositions[u].split(":")[1]){
-							arrayofpositions[u]=update
-							self.postMessage(update)
+							arrayofpositions.splice(u,1)
 							break
 						}
 					}

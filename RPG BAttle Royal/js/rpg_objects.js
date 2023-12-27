@@ -760,6 +760,7 @@ Game_Screen.prototype.startTint = function(tone, duration) {
 };
 
 Game_Screen.prototype.startFlash = function(color, duration) {
+    if(localStorage.canflash==false) return
     this._flashColor = color.clone();
     this._flashDuration = duration;
 };

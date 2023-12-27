@@ -36,6 +36,10 @@ if(!localStorage.hidechat){
   localStorage.hidechat=false
 }
 
+if(!localStorage.canflash){
+  localStorage.canflash=true
+}
+
 if(!localStorage.reconnect){
   localStorage.reconnect=""
 }
@@ -753,3 +757,9 @@ function $copyEvent(id,thiseventid){
     
   }
 }
+
+Game_Screen.prototype.startFlash = function(color, duration) {
+  if(localStorage.canflash==false) return
+  this._flashColor = color.clone();
+  this._flashDuration = duration;
+};
