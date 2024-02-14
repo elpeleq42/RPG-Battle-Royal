@@ -237,7 +237,7 @@ function server_func(connection) {
     }
 
     function cancel_binary() {
-        console.log("Connection tried to upload file and got kicked")
+        console.log("Connection tried to upload file and got kicked"+ " - "+Date())
         connection.close()
         return
     }
@@ -274,7 +274,7 @@ function server_func(connection) {
 
         connection.postMessage++
         if (connection.postMessage > 50) {
-            console.log(connection.playername + " has been kicked for sending too many messages per second")
+            console.log(connection.playername + " has been kicked for sending too many messages per second"+ " - "+Date())
             connection.close()
         }
 
@@ -288,7 +288,7 @@ function server_func(connection) {
             str1 = decrypted
         } else {
             if (connection.postMessage > 5) {
-                console.log("A connection has tried to send over 5 messages per second before identification")
+                console.log("A connection has tried to send over 5 messages per second before identification"+ " - "+Date())
                 connection.close()
             }
             str1 = str
@@ -341,7 +341,7 @@ function server_func(connection) {
             }
         } else if (connection.playerid === null && numberofplayers < maxnumberofplayers) {
             if (!(str1.startsWith("pass")) || ((str1.split(":").length < 2 && serverpass !== null) || (str1.split(":")[2] != serverpass && serverpass !== null))) {
-                console.log("connection tried to interact with server in abnormal way")
+                console.log("connection tried to interact with server in abnormal way"+ " - "+Date())
                 connection.close()
                 return
             }
@@ -413,7 +413,7 @@ function server_func(connection) {
 
             broadcast("spawn:" + (1000 + connection.playerid) + ":" + connection.playername)
 
-            console.log("User:" + name + " ID:" + connection.playerid + " has joined the server")
+            console.log("User:" + name + " ID:" + connection.playerid + " has joined the server"+ " - "+Date())
             broadcast("chat::" + name + " has joined.")
 
             broadcast("eventid:" + connection.playerid)
@@ -430,7 +430,7 @@ function server_func(connection) {
         } else if (str1.startsWith("arrow")) {
             var str2 = str1.split(":")
             if (Math.abs(str2[1] - connection.x) > 2 || Math.abs(str2[2] - connection.y) > 2) {
-                console.log(connection.playername + " spawned an arrow in suspicious location")
+                console.log(connection.playername + " spawned an arrow in suspicious location"+ " - "+Date())
                 connection.close();
                 return
             }
@@ -460,7 +460,7 @@ function server_func(connection) {
             connection.msgcounter += 5
             var str2 = str1.split(":")
             if (Math.abs(str2[1] - connection.x) > 2 || Math.abs(str2[2] - connection.y) > 2) {
-                console.log(connection.playername + " spawned an magic missile in suspicious location")
+                console.log(connection.playername + " spawned an magic missile in suspicious location"+ " - "+Date())
                 connection.close();
                 return
             }
@@ -473,7 +473,7 @@ function server_func(connection) {
             objectcounter++
         } else if (str1.startsWith("flashlight")) {
             if ((connection.playerid + 1000) != str1.split(":")[1]) {
-                console.log(connection.playername + " has tried to turn someone else's flashlight on")
+                console.log(connection.playername + " has tried to turn someone else's flashlight on"+ " - "+Date())
                 connection.close();
                 return
             }
@@ -515,7 +515,7 @@ function server_func(connection) {
         } else if (str1.startsWith("dead")) {
             connection.msgcounter += 5
             if (str1.split(":")[1] != connection.playerid) {
-                console.log("connection closed for trying to tell another to die")
+                console.log("connection closed for trying to tell another to die"+ " - "+Date())
                 connection.close();
                 return
             }
@@ -676,7 +676,7 @@ function server_func(connection) {
             str2 = str2.splice(1, str2.length)
             str2 = str2.join(":")
 
-            console.log("chat message: " + str2)
+            console.log("chat message: " + str2+ " - "+Date())
             if (str2.startsWith("/adm")) {
                 str2 = str2.split(" ")
                     .splice(1, str2.length)
@@ -724,7 +724,7 @@ function server_func(connection) {
                 for (var i = server.connections.length; i--;) {
                     if (server.connections[i].playerid == str2[1]) {
                         broadcast("chat::>" + server.connections[i].playername + " has been kicked.")
-                        console.log(server.connections[i].playername + " has been kicked.")
+                        console.log(server.connections[i].playername + " has been kicked."+ " - "+Date())
                         server.connections[i].close()
                         break
                     }
@@ -736,7 +736,7 @@ function server_func(connection) {
                     if (server.connections[i].playerid == str2[1]) {
                         broadcast("chat::>" + server.connections[i].playername + " has been banned.")
                         server.connections[i].close()
-                        console.log(server.connections[i].playername + " has been banned.")
+                        console.log(server.connections[i].playername + " has been banned."+ " - "+Date())
                         banlist.push([server.connections[i].playerip, server.connections[i].headers.origin.split("//")[1]])
                         break
                     }
@@ -860,7 +860,7 @@ function server_func(connection) {
     function close_connection() {
         if (connection.playername !== null) {
             broadcast("chat::" + connection.playername + " has left.")
-            console.log("User: " + connection.playername + " ID: " + connection.playerid + " has left the server.")
+            console.log("User: " + connection.playername + " ID: " + connection.playerid + " has left the server."+ " - "+Date())
             var lasthighestid = highestid
             for (var a = 0; a <= lasthighestid; a++) {
                 if (playercounter[a] === 1) {
@@ -1235,7 +1235,7 @@ setInterval(() => {
 
         server.connections[i].afkcount++
         if (server.connections[i].afkcount > maxafktime) {
-            console.log(server.connections[i].playername + " has been kicked for being afk.")
+            console.log(server.connections[i].playername + " has been kicked for being afk."+ " - "+Date())
             server.connections[i].close()
         }
     }
@@ -1447,4 +1447,4 @@ function begingamezombies() {
     alreadystarted = true;
 }
 
-console.log("Server running!")
+console.log("Server running!"+ " - "+Date())

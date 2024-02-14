@@ -44,7 +44,7 @@
         background-color: transparent;
         color: white;
     }
-    .button:hover{
+    .button:hover, .button:focus{
         background-color: #888;
     }
     .hr{
@@ -63,7 +63,7 @@
     max-height: 90%;
     overflow: auto;">
     
-        <div id='serverlist' >
+        <div class="listofservers" id='serverlist' >
             
 
         </div>
@@ -71,6 +71,7 @@
     <center><button style="width: 48px;-webkit-user-select:none;height: 48px;font-size: 24px; line-height: 18px;position: fixed;bottom: 10px;" onclick="window.parent.AudioManager.playSe({ name: 'Equip1', volume: 25, pitch: 150, pan: 0 } );document.getElementById('serverlist').innerHTML='';window.parent.stopchecking=false;window.parent.servertest(window.parent.servernames[0],window.parent.servers[0])">🗘</button></center>
 </body>
 <script>
+    var noselect=true
     parent.document.getElementById('serverlist').focus()
     document.addEventListener('keydown', function(e) {
         if(e.keyCode == 27){
@@ -79,6 +80,51 @@
             parent.document.getElementById('serverlist').remove();
         }
     });
+    setInterval(() => {
+        if(noselect && document.getElementsByClassName("listofservers")[0] && document.getElementsByClassName("listofservers")[0].children.length>2) {
+            document.getElementsByClassName("listofservers")[0].children[0].focus()
+            noselect=false
+            current=0
+        }else if(document.getElementsByClassName("listofservers")[0] && document.getElementsByClassName("listofservers")[0].children.length>2){
+            total=document.getElementsByClassName("listofservers")[0].children.length-2
+
+            if(window.parent.Input.isTriggered('up')){
+
+                if(current>0) current-=2
+                else current=total
+
+                document.getElementsByClassName("listofservers")[0].children[current].focus()
+
+            }else if(window.parent.Input.isTriggered('down')){
+
+                if(current<total) current+=2
+                else current=0
+                document.getElementsByClassName("listofservers")[0].children[current].focus()
+
+            }else if(window.parent.Input.isTriggered('ok')){
+
+                document.activeElement.click() 
+
+            }
+        }
+
+        if(window.parent.Input.isTriggered('cancel')){
+
+            window.parent.finallist=[];
+            window.parent.AudioManager.playSe({ name: 'Equip1', volume: 25, pitch: 150, pan: 0 } );
+            parent.$gameTemp.reserveCommonEvent(4,true);
+            parent.document.getElementById('serverlist').remove();
+
+        }else if(window.parent.Input.isTriggered('shift')){
+
+            window.parent.AudioManager.playSe({ name: 'Equip1', volume: 25, pitch: 150, pan: 0 } );
+            document.getElementById('serverlist').innerHTML='';
+            window.parent.stopchecking=false;
+            window.parent.servertest(window.parent.servernames[0],window.parent.servers[0])
+
+        }
+
+    }, 16);
 </script>
 
 </html>

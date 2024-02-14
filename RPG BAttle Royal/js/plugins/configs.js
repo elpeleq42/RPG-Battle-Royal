@@ -282,23 +282,38 @@ window.playerdead=false
 
 function playerdirect(){
   if(!$gamePlayer) return
-    if(Math.abs(TouchInput._x-$gamePlayer.screenX())>Math.abs(TouchInput._y-$gamePlayer.screenY())){
+    if(Input.isControllerConnected()==true){
+
+      if(Input.isPressed('up')) $gamePlayer.setDirection(8)
+      else if(Input.isPressed('down')) $gamePlayer.setDirection(2)
+      else if(Input.isPressed('left')) $gamePlayer.setDirection(4)
+      else if(Input.isPressed('right')) $gamePlayer.setDirection(6)
+
+      if(Math.abs(navigator.getGamepads()[0].axes[2])>Math.abs(navigator.getGamepads()[0].axes[3])){ //turn in X
+        if(navigator.getGamepads()[0].axes[2] > 0.5) $gamePlayer.setDirection(6)
+        else if(navigator.getGamepads()[0].axes[2] < -0.5) $gamePlayer.setDirection(4)
+      }else{ //turn in y
+        if(navigator.getGamepads()[0].axes[3] > 0.5) $gamePlayer.setDirection(2)
+        else if(navigator.getGamepads()[0].axes[3] < -0.5) $gamePlayer.setDirection(8)
+      }
+
+    }else{
+      if(Math.abs(TouchInput._x-$gamePlayer.screenX())>Math.abs(TouchInput._y-$gamePlayer.screenY())){
         if($gamePlayer.screenX()>TouchInput._x>0){
           
             $gamePlayer.setDirection(4)
         }else{
-            
             $gamePlayer.setDirection(6)
         }
-    }else{
-        if($gamePlayer.screenY()<TouchInput._y>0){
-            
-            $gamePlayer.setDirection(2)
-        }else{
-            
-            $gamePlayer.setDirection(8)
-        }
+      }else{
+          if($gamePlayer.screenY()<TouchInput._y>0){
+              $gamePlayer.setDirection(2)
+          }else{
+              $gamePlayer.setDirection(8)
+          }
+      }
     }
+    
 }
 setInterval(playerdirect,16)
 
@@ -775,4 +790,82 @@ Game_Event.prototype.erase = function() {
   this._erased = true;
   this.refresh();
   setTimeout($eventpropereraser,5000,this._eventId)
+};
+
+
+Weather.prototype._updateAllSprites = function() {
+    var maxSprites = Math.floor(this.power * 10);
+    while (this._sprites.length < maxSprites) {
+        this._addSprite();
+    }
+    while (this._sprites.length > maxSprites) {
+        this._removeSprite();
+    }
+    for (let i = 0; i < this._sprites.length; i++) {
+        const sprite = this._sprites[i];
+        this._updateSprite(sprite);
+        sprite.x = sprite.ax - this.origin.x;
+        sprite.y = sprite.ay - this.origin.y;
+    }    
+};
+
+
+ImageCache.prototype.releaseReservation = function(reservationId) {
+  var items = this._items;
+
+  for (const key in items) {
+      if (items.hasOwnProperty(key)) {
+          const item = items[key];
+          if (item.reservationId === reservationId) {
+              delete item.reservationId;
+          }
+      }
+  }
+};
+
+ImageCache.prototype._truncateCache = function() {
+  var items = this._items;
+  var sizeLeft = ImageCache.limit;
+
+  const sortedItems = Object.values(items)
+      .sort((a, b) => b.touch - a.touch);
+
+  for (const item of sortedItems) {
+      if (sizeLeft > 0 || this._mustBeHeld(item)) {
+          var bitmap = item.bitmap;
+          sizeLeft -= bitmap.width * bitmap.height;
+      } else {
+          delete items[item.key];
+      }
+  }
+};
+
+
+ImageCache.prototype.releaseReservation = function(reservationId) {
+  var items = this._items;
+
+  for (const key in items) {
+      if (items.hasOwnProperty(key)) {
+          const item = items[key];
+          if (item.reservationId === reservationId) {
+              delete item.reservationId;
+          }
+      }
+  }
+};
+
+
+ImageCache.prototype.isReady = function() {
+  var items = this._items;
+
+  for (const key in items) {
+      if (items.hasOwnProperty(key)) {
+          const item = items[key];
+          if (!item.bitmap.isRequestOnly() && !item.bitmap.isReady()) {
+              return false;
+          }
+      }
+  }
+
+  return true;
 };

@@ -1,26 +1,6 @@
-Server>
-Changed:
--Improved server code readability
-
-Fixed:
--Free4All Game won't reset every time a new player joins anymore
--Fixed issue causing player to disconnect on the BattleRoyal map
-
-Client>
-Changed:
--When a player open/closes a door, other's can now hear it
--Updated NW.js to v0.83.0
--Optimized the tower defense maps
--Zombies in Zombie mode can now attack twice per second
-
-Fixed:
--Players no longer move back and forth all the time
--Player's body no longer remains in the map after they disconnect
--Fixed potential crash when animations are broadcasted by the server
--Fixed doors not closing when openned after damaged
--Fixed fireball sometimes not causing damage
--Fixed crash that could occur on Tower Defense
--Fixed issue causing main menu to not show up sometimes after openning the server list
--Fixed sometimes players wouldnt turn into zombies at the beginning of the game
--Fixed zombies being able to attack too fast
--Fixed map being permanently brighter if game reset and the player was a zombie with nightvision on
+Client:
+-Improved controller support
+Fixes:
+-Fixed pressing cancel defaulting to Tower Defense 2 within the Offline menu
+-Fixed Launcher not working after a level up(Tower Defense)
+-Fixed launcher AI targetting enemies that had been destroyed for a few seconds(Tower Defense)
