@@ -57,7 +57,7 @@ function mobAI() {
             var minDistance = 10000;
             var closest, distance;
             for (var a = 0; a < points.length; a++) {
-                distance = (tempobj[1] - points[a].x) * (tempobj[1] - points[a].x) + (tempobj[2] - points[a].y) * (tempobj[2] - points[a].y);
+                distance = Math.pow((tempobj[1] - points[a].x),2)  + Math.pow((tempobj[2] - points[a].y),2);
                 if (distance < minDistance) {
                     minDistance = distance;
                     closest = points[a];
@@ -76,7 +76,7 @@ function mobAI() {
                     arr.push(arrx)
                 }
                 for (var ii = 0; ii < nonmovable.length; ii++) {
-                    if (((tempobj[1] - nonmovable[ii].split(":")[1]) * (tempobj[1] - nonmovable[ii].split(":")[1]) + (tempobj[2] - nonmovable[ii].split(":")[2]) * (tempobj[2] - nonmovable[ii].split(":")[2])) < 64) {
+                    if ((Math.pow(tempobj[1] - nonmovable[ii].split(":")[1],2)  + Math.pow(tempobj[2] - nonmovable[ii].split(":")[2],2) ) < 64) {
                         arr[(8 + (nonmovable[ii].split(":")[2] - tempobj[2]))][(8 + (nonmovable[ii].split(":")[1] - tempobj[1]))] = 1
                     }
                 }

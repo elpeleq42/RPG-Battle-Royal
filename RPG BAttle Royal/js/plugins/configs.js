@@ -75,6 +75,14 @@ Game_BattlerBase.prototype.setMp = function(mp) {
     this.refresh();
 };
 
+Game_Battler.prototype.gainHp = function(value) {
+  if(value<0) $gameScreen.startFlash([255, 0, 0, 128], 8);
+  this._result.hpDamage = -value;
+  this._result.hpAffected = true;
+  this.setHp(this.hp + value);
+};
+
+
 Game_BattlerBase.prototype.setHp = function(hp) {
   if(hp<0) $gameScreen.startFlash([255, 0, 0, 128], 8);
     this._hp = hp;
@@ -315,7 +323,23 @@ function playerdirect(){
     }
     
 }
-setInterval(playerdirect,16)
+
+Game_Player.prototype.moveByInput = function() {
+  if (!this.isMoving() && this.canMove()) {
+      var direction = this.getInputDirection();
+      if (direction > 0) {
+          $gameTemp.clearDestination();
+      } else if ($gameTemp.isDestinationValid()){
+          var x = $gameTemp.destinationX();
+          var y = $gameTemp.destinationY();
+          direction = this.findDirectionTo(x, y);
+      }
+      if (direction > 0) {
+          this.executeMove(direction);
+      }
+      playerdirect()
+  }
+};
 
 
 Game_Temp.prototype.setDestination = function(x, y) {

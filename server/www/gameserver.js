@@ -38,10 +38,11 @@ var playernames = new Array(1001)
 var serverlock = reseting = alreadystarted = false
 var checkendgame, temp, disconnectthis
 var counttimetilmapvote = mapvotetime
-var objectcounter = highestid = playersalive = numberofplayers = giveID = 0
+var objectcounter = highestid = playersalive = numberofplayers = giveID = damagerID = 0
 var timelapse = arrbuffer = null
 var sentries = []
 var mapvotes = []
+var damagerList = []
 
 
 
@@ -49,9 +50,7 @@ function LoadMapToRAM() {
     if (map !== "default" && map !== "zombies" && map !== "free4all" && !(map.startsWith("http"))) {
         map = fs.readFileSync(servmap);
         if (upspeedmap != 0) {
-
-
-
+            
             breakup = Math.ceil(map.length / (204800 * upspeedmap))
             forsize = Math.ceil(map.length / breakup)
             arrbuffer = new Array(breakup)
@@ -407,7 +406,8 @@ function server_func(connection) {
                 temp = objects[i];
                 temp = temp.toString().split(":")
 
-                connection.todo.push("build:" + temp[1] + ":" + temp[2] + ":" + temp[3] + ":" + temp[0] + ":" + str1[4] + ":" + str1[5])
+                connection.todo.push("build:" + temp[1] + ":" + temp[2] + ":" + temp[3] + ":" + temp[0] + ":" + temp[4] + ":" + temp[5]+ ":" + temp[6]+ ":" + temp[7])
+
 
             }
 
@@ -434,18 +434,69 @@ function server_func(connection) {
                 connection.close();
                 return
             }
-            broadcast(str1)
+            damagerID++
+            broadcast(str1+":"+damagerID)
+        }else if(str1.startsWith("buildingdmg")) {
+            connection.msgcounter += 2
+
+            tempcheckid=Number(str1.split(":").pop())
+            tempcheckidobj=Number(str1.split(":")[2])
+
+            if(!damagerList[tempcheckid] || damagerList[tempcheckid].includes(tempcheckidobj)!=true){
+                if(!damagerList[tempcheckid]) damagerList[tempcheckid]=[]
+                damagerList[tempcheckid].push(tempcheckidobj)
+                var tempobj3
+                for (var i=objects.length; i--;) {
+
+                    tempobj3=objects[i].split(":")                    
+                    if(tempobj3[0]==tempcheckidobj){
+                        
+
+                        tempobj3[7]=Number(tempobj3[7])-Number(str1.split(":")[1])
+                        if(tempobj3[7]<=0){
+
+                            objects.splice(i, 1);
+                            i++
+                            broadcast("destroy:"+tempobj3[0]+":"+tempobj3[1]+":"+tempobj3[2])
+
+                            for (var u = 0; u < nonmovable.length; u++) {
+                                if (nonmovable[u].split(":")[0] == tempobj3[0]) {
+                                    nonmovable.splice(u, 1)
+                                    break
+                                }
+                            }
+                            for (var u = 0; u < sentries.length; u++) {
+                                if (sentries[u][0] == tempobj3[0]) {
+                                    sentries.splice(u, 1)
+                                    break
+                                }
+                            }
+
+                            
+                        }else{
+                            objects[i]=tempobj3.join(":")
+                            if(tempobj3[7]==66){
+                                broadcast("rotation:"+tempobj3[0]+":6")
+                            }else{
+                                broadcast("rotation:"+tempobj3[0]+":8")
+                            }
+                        }
+
+                    }
+                }
+
+            }
         } else if (str1.startsWith("build")) {
             connection.msgcounter += 5
             str1 = str1.split(":")
             if (str1[1] == 1) {
-                createObject(connection.x, (Number(connection.y) + 1), str1[2], str1[3], str1[4], connection.playerid)
+                createObject(connection.x, (Number(connection.y) + 1), str1[2], str1[3], str1[4], connection.playerid,99)
             } else if (str1[1] == 2) {
-                createObject((Number(connection.x) - 1), connection.y, str1[2], str1[3], str1[4], connection.playerid)
+                createObject((Number(connection.x) - 1), connection.y, str1[2], str1[3], str1[4], connection.playerid,99)
             } else if (str1[1] == 3) {
-                createObject((Number(connection.x) + 1), connection.y, str1[2], str1[3], str1[4], connection.playerid)
+                createObject((Number(connection.x) + 1), connection.y, str1[2], str1[3], str1[4], connection.playerid,99)
             } else if (str1[1] == 4) {
-                createObject(connection.x, (Number(connection.y) - 1), str1[2], str1[3], str1[4], connection.playerid)
+                createObject(connection.x, (Number(connection.y) - 1), str1[2], str1[3], str1[4], connection.playerid,99)
             }
 
         } else if (str1.startsWith("tpevent")) {
@@ -456,7 +507,7 @@ function server_func(connection) {
             connection.y = str1.split(":")[2]
         } else if (str1.startsWith("animation") || str1.startsWith("rotation") || str1.startsWith("selfswitch") || str1.startsWith("opened")) {
             broadcast(str1)
-        } else if (str1.startsWith("magic")) {
+        }  else if (str1.startsWith("magic")) {
             connection.msgcounter += 5
             var str2 = str1.split(":")
             if (Math.abs(str2[1] - connection.x) > 2 || Math.abs(str2[2] - connection.y) > 2) {
@@ -464,12 +515,13 @@ function server_func(connection) {
                 connection.close();
                 return
             }
-            broadcast(str1)
+            damagerID++
+            broadcast(str1+":"+damagerID)
         } else if (str1.startsWith("chest")) {
             connection.msgcounter += 5
             broadcast(str1 + ":" + objectcounter)
             str11 = str1.split(":")
-            objects[objectcounter] = objectcounter + ":" + str11[2] + ":" + str11[3] + ":" + str11[1]
+            objects.push( objectcounter + ":" + str11[2] + ":" + str11[3] + ":" + str11[1])
             objectcounter++
         } else if (str1.startsWith("flashlight")) {
             if ((connection.playerid + 1000) != str1.split(":")[1]) {
@@ -511,7 +563,8 @@ function server_func(connection) {
                 connection.close();
                 return
             }
-            broadcast(str1)
+            damagerID++
+            broadcast(str1+":"+damagerID)
         } else if (str1.startsWith("dead")) {
             connection.msgcounter += 5
             if (str1.split(":")[1] != connection.playerid) {
@@ -920,10 +973,14 @@ function quicktimer() {
         server.connections[i].msgcounter = 0
     }
     for (var i = 0; i < sentries.length; i++) {
-        broadcast("arrow:" + sentries[i][1] + ":" + (sentries[i][2]) + ":" + sentries[i][3] + ":1")
-        broadcast("arrow:" + (sentries[i][1]) + ":" + sentries[i][2] + ":" + sentries[i][3] + ":2")
-        broadcast("arrow:" + (sentries[i][1]) + ":" + sentries[i][2] + ":" + sentries[i][3] + ":3")
-        broadcast("arrow:" + sentries[i][1] + ":" + (sentries[i][2]) + ":" + sentries[i][3] + ":4")
+        damagerID++
+        broadcast("arrow:" + sentries[i][1] + ":" + (sentries[i][2]) + ":" + sentries[i][3] + ":1"+":"+damagerID)
+        damagerID++
+        broadcast("arrow:" + (sentries[i][1]) + ":" + sentries[i][2] + ":" + sentries[i][3] + ":2"+":"+damagerID)
+        damagerID++
+        broadcast("arrow:" + (sentries[i][1]) + ":" + sentries[i][2] + ":" + sentries[i][3] + ":3"+":"+damagerID)
+        damagerID++
+        broadcast("arrow:" + sentries[i][1] + ":" + (sentries[i][2]) + ":" + sentries[i][3] + ":4"+":"+damagerID)
     }
     for (var i = 0; i < objects.length; i++) {
         if (objects[i] && objects[i].indexOf("mob1") > -1) {
@@ -972,12 +1029,15 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function createObject(x, y, objid, extra, tp, playerid) {
+function createObject(x, y, objid, extra, tp, playerid,hp) {
     if (!extra) extra = ""
     if (!tp) tp = ""
     if (!playerid) playerid = ""
-    broadcast("build:" + x + ":" + y + ":" + objid + ":" + objectcounter + ":" + extra + ":" + tp + ":" + playerid)
-    objects.push(objectcounter + ":" + x + ":" + y + ":" + objid + ":" + extra + ":" + tp + ":" + playerid)
+
+    if(extra=="mob") hp=99
+
+    broadcast("build:" + x + ":" + y + ":" + objid + ":" + objectcounter + ":" + extra + ":" + tp + ":" + playerid+":"+hp)
+    objects.push(objectcounter + ":" + x + ":" + y + ":" + objid + ":" + extra + ":" + tp + ":" + playerid+":"+hp)
     if (extra == "sentry") {
         sentries.push([objectcounter, x, y, playerid])
     }
@@ -1046,9 +1106,13 @@ setInterval(aiupdater, 250)
 begingame = function () {
     if (alreadystarted == true) return;
 
+    damagerList =[]
+    damagerID=0
+
     reseting = false
     if (timelapse != null) {
         clearInterval(timelapse)
+        timelapse=null
     }
     if (timelapse == null) {
         var light = 100
@@ -1244,9 +1308,13 @@ setInterval(() => {
 function begingamefree4all() {
     if (alreadystarted == true) return;
 
+    damagerList =[]
+    damagerID=0
+
     reseting = false
     if (timelapse != null) {
         clearInterval(timelapse)
+        timelapse=null
     }
     if (timelapse == null) {
         var light = 100
@@ -1345,6 +1413,10 @@ function begingamezombies() {
     checkobjs = []
     nonmovable = []
     sentries = []
+
+    damagerList =[]
+    damagerID=0
+    
     broadcast("reset")
     for (var u = 1; u < highestid; u++) {
         broadcast("eventid:" + u)

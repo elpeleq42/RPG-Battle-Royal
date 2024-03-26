@@ -1,6 +1,12 @@
-Client:
--Improved controller support
-Fixes:
--Fixed pressing cancel defaulting to Tower Defense 2 within the Offline menu
--Fixed Launcher not working after a level up(Tower Defense)
--Fixed launcher AI targetting enemies that had been destroyed for a few seconds(Tower Defense)
+Changed:
+-Balanced Crystal to regen 5 health and mana per second instead of 20
+
+Fixed:
+-Players now receive money if a new player joins and is killed by their turrent
+-Buildings now properly keeps track of their HP instead of relying on player whos been in the server the longest
+-Player no longer flicker back and forth if you look one direction and walk the opposite direction
+-Player no longer has a chance of spawning outside of the map in free for all
+-Collision problems in free for all and battleroyal removed
+-Grampa now properly charges money... like he should... eh guy is getting old
+-Day/Night cycle now won't desynch between players upon reset
+-Unnecessary timer no longer shows in every map
