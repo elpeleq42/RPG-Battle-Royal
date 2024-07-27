@@ -1,4 +1,3 @@
 Official1 - ws://peq42.kinghost.net:21092
 Official2 - ws://peq42.kinghost.net:21093
-Official3 - ws://peq42.kinghost.net:21084
 local - ws://localhost:1000
