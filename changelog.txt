@@ -1,12 +1,12 @@
 Changed:
--Balanced Crystal to regen 5 health and mana per second instead of 20
+-Changed the reload button to just say "Reload" on the server list, fixing a missing icon on Linux
+-Added a Game.desktop file to simplify openning the game on Linux(renamed the Game binary to nw)
+-Updated NW.js to v0.87
+-Updated official servers to Node.js 22(better performance), reduced number to 2
+-Increased amount of detail on certain maps
+-Improved game launch performance
 
 Fixed:
--Players now receive money if a new player joins and is killed by their turrent
--Buildings now properly keeps track of their HP instead of relying on player whos been in the server the longest
--Player no longer flicker back and forth if you look one direction and walk the opposite direction
--Player no longer has a chance of spawning outside of the map in free for all
--Collision problems in free for all and battleroyal removed
--Grampa now properly charges money... like he should... eh guy is getting old
--Day/Night cycle now won't desynch between players upon reset
--Unnecessary timer no longer shows in every map
+-Server now properly kicks clients for spamming communications with the server
+-Fixed TAB taking two presses to show statistics after game loses focus
+-Fixed Main menu music still playing while in game

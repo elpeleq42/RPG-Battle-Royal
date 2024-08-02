@@ -49,6 +49,11 @@ if(localStorage.hidechat==true){
 Game_Player.prototype.reserveTransfer = function(mapId, x, y, d, fadeType,check) {
   
     if(x=='NaN' || y=='NaN') return
+    if(mapId!=$gameMap._mapId) {
+      AudioManager.fadeOutBgs(1);
+      AudioManager.fadeOutBgm(1);
+
+    }
     if(check==true || ($gameMap._mapId!=1 && $gameMap._mapId<5 ) || $gameMap._mapId>5){
         this._transferring = true;
         if(($gameMap._mapId==1 || $gameMap._mapId>4 ) && $gameMap._mapId<9){
@@ -224,46 +229,41 @@ SceneManager.onError = function(e) {
 
 
 function resetimgandaudio(){
-    var ncp = require('./js/libs/ncp.js').ncp;
-    var fs=require("fs")
-    var rmdir = function(path) {
-      if( fs.existsSync(path) ) {
-        fs.readdirSync(path).forEach(function(file,index){
-          var curPath = path + "/" + file;
-          if(fs.lstatSync(curPath).isDirectory()) { // recurse
-            rmdir(curPath);
-          } else { // delete file
-            fs.unlinkSync(curPath);
-          }
-        });
-        fs.rmdirSync(path);
-      }
-    };
+  var fs=require("fs")
 
 
-    if(!fs.existsSync("./www/backup/img")){
-        if(!fs.existsSync("./www/backup/")) fs.mkdirSync("./www/backup");
-        fs.mkdirSync("./www/backup/audio");
-        fs.mkdirSync("./www/backup/img");
-        ncp("./www/img/", "./www/backup/img/",function(){});
-        ncp("./www/audio/", "./www/backup/audio/",function(){});
-    }else{
-        if (fs.existsSync("./www/img")) {
-            rmdir("./www/img");
+  if(!fs.existsSync("./www/backup/img")){
+      if(!fs.existsSync("./www/backup/")) fs.mkdirSync("./www/backup");
+      fs.mkdirSync("./www/backup/audio");
+      fs.mkdirSync("./www/backup/img");
+      fs.cp("./www/img/", "./www/backup/img/",{    recursive: true,  },function(){});
+      fs.cp("./www/audio/", "./www/backup/audio/",{    recursive: true,  },function(){});
+  }else{
+      if (fs.existsSync("./www/img")) {
+          fs.rm("./www/img", { recursive: true, force: true }, () => {
             fs.mkdirSync("./www/img");
-        }else{
-          fs.mkdirSync("./www/img")
-        }
-        ncp("./www/backup/img/", "./www/img/", function (err) {})
+            fs.cp("./www/backup/img/", "./www/img/", {    recursive: true,  },function(){})
+          })
+          
+      }else{
+        fs.mkdirSync("./www/img")
+        fs.cp("./www/backup/img/", "./www/img/", {    recursive: true,  },function(){})
+      }
+      
 
-        if (fs.existsSync("./www/audio")) {
-            rmdir("./www/audio");
+      if (fs.existsSync("./www/audio")) {
+          fs.rm("./www/audio", { recursive: true, force: true }, () => {
             fs.mkdirSync("./www/audio");
-        }else{
-            fs.mkdirSync("./www/audio")
-        }
-        ncp("./www/backup/audio/", "./www/audio/", function (err) {})
-    }
+            fs.cp("./www/backup/audio/", "./www/audio/", {    recursive: true,  },function(){})
+
+          })
+
+      }else{
+          fs.mkdirSync("./www/audio")
+          fs.cp("./www/backup/audio/", "./www/audio/", {    recursive: true,  },function(){})
+      }
+      
+  }
 
 }
 
@@ -534,7 +534,7 @@ serverjoin=function() {
     connection.onmessage=function(msgg){
     
       msg=msgg.data
-      window.worker = new Worker("js/webworker.js");
+      window.worker = new Worker("./js/webworker.js");
     if(msg==="default"){
       hasloaded=true
       document.getElementById('loadingtext').innerText = "Loading Map..."
@@ -892,4 +892,32 @@ ImageCache.prototype.isReady = function() {
   }
 
   return true;
+};
+
+
+
+
+
+var $ispressingtab=false
+
+function checkTabPress(e) {
+    e = e || event;
+    var activeElement;
+    if (e.keyCode == 9) {
+        $ispressingtab=false
+    }
+}
+function checkpressedtab(e) {
+    e = e || event;
+    var activeElement;
+    if (e.keyCode == 9) {
+        $ispressingtab=true
+    }
+}
+window.addEventListener('keydown', checkpressedtab);
+window.addEventListener('keyup', checkTabPress);
+
+
+Input._onLostFocus = function() {
+    if($ispressingtab==false) this.clear();
 };

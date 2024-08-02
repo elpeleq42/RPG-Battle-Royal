@@ -7,29 +7,30 @@ try {
 
 var mxplayers, adminpassword, servportnumb, initgold, upspeed, servpass, servmap
 //Server configs://////////////////////////////////
-const maxnumberofplayers = mxplayers || 100 // Up to 1000
-const admpassword = adminpassword || null //
-const serverPort = servportnumb || 1000 //
-const initialgold = initgold || 0 //
-const upspeedmap = upspeed || 0 //
+var maxnumberofplayers = mxplayers || 100 // Up to 1000
+var admpassword = adminpassword || null //
+var serverPort = servportnumb || 1000 //
+var initialgold = initgold || 0 //
+var upspeedmap = upspeed || 0 //
 var serverpass = servpass || null //
 var map = servmap || "default" // default, free4all, zombies, a link or full file path
-const tickrate = 30 // Between 1 and 1000
-const maxafktime = 120 // Above 0, in seconds
-const maxkills = 25 //above 0, amount of kills before reset on free for all
-const mapvote = false //true if users are allowed to vote for map change
-const mapvotetime = 600 //time in seconds between map votes
-const mapnames = ["Battle Royal", "Free for All", "Zombies"] //list of map names, must be in the same order as below
-const maplinks = ["default", "free4all", "zombies"] //full links and/or filepaths
+var tickrate = 30 // Between 1 and 1000
+var maxafktime = 120 // Above 0, in seconds
+var maxkills = 25 //above 0, amount of kills before reset on free for all
+var mapvote = false //true if users are allowed to vote for map change
+var mapvotetime = 600 //time in seconds between map votes
+var mapnames = ["Battle Royal", "Free for All", "Zombies"] //list of map names, must be in the same order as below
+var maplinks = ["default", "free4all", "zombies"] //full links and/or filepaths
 ///////////////////////////////////////
 
 
 
 
 //////////////////////////////////////////////
-const ws = require("./lib/index.js")
-const crypt = require('crypto')
-const fs = require('fs')
+var ws = require("./lib/index.js")
+var crypt = require('crypto')
+var fs = require('fs');
+var { connect } = require('http2');
 var nonmovable = objects = checkobjs = tobeuploaded = banlist = []
 var playercounter = new Array(1001)
     .fill(0)
@@ -271,8 +272,8 @@ function server_func(connection) {
     function on_text(str) {
 
 
-        connection.postMessage++
-        if (connection.postMessage > 50) {
+        connection.msgcounter++
+        if (connection.msgcounter > 50) {
             console.log(connection.playername + " has been kicked for sending too many messages per second"+ " - "+Date())
             connection.close()
         }
@@ -286,7 +287,7 @@ function server_func(connection) {
                 .toString();
             str1 = decrypted
         } else {
-            if (connection.postMessage > 5) {
+            if (connection.msgcounter > 5) {
                 console.log("A connection has tried to send over 5 messages per second before identification"+ " - "+Date())
                 connection.close()
             }
@@ -395,6 +396,7 @@ function server_func(connection) {
             highestid++
             for (var u = 1; u < highestid; u++) {
                 connection.todo.push("spawn:" + (1000 + u) + ":" + playernames[u])
+                if(server.connections[u]) connection.todo.push("update:"+server.connections[u].x+":"+server.connections[u].y)
                 if (playercounter[u] === 0) {
                     broadcast("dead:" + u)
                 }
@@ -902,7 +904,7 @@ function server_func(connection) {
             connection.y = str1.split(":")[1]
             broadcast("update:" + connection.playerid + ":" + str1 + ":" + connection.playername + ":" + connection.alive)
         }
-        if (on_message) {
+        if (typeof on_message!='undefined') {
             on_message(str1, connection)
         }
 
@@ -944,7 +946,8 @@ function server_func(connection) {
     connection.on("close", close_connection)
 
     function error_connection(errObj) {
-        if (on_close) {
+        if (typeof on_close!='undefined') {
+            console.log("User: "+connection.playername+" ID: "+connection.playerid+" had an error: "+ JSON.stringify(errObj))
             on_close(connection, errObj)
         }
     }
@@ -964,7 +967,7 @@ if (fs.existsSync("./custom.js")) {
     }))
 }
 
-if (on_start) {
+if (typeof on_start!='undefined') {
     on_start()
 }
 
@@ -997,7 +1000,7 @@ function action_per_tick() {
     var allcons = server.connections
     if (allcons.length == 0) return;
 
-    if (on_tick) {
+    if (typeof on_tick!='undefined') {
         on_tick()
     }
 
@@ -1332,8 +1335,8 @@ function begingamefree4all() {
     }
 
 
-    const possibleX = [12, 22, 32, 41, 49, 39, 43, 59, 70, 61, 53, 59, 69, 13, 78, 9, 9, 13, 4, 22, 27, 27, 36, 45, 40, 38, 58]
-    const possibleY = [7, 5, 7, 8, 14, 28, 35, 42, 18, 8, 58, 6, 61, 64, 76, 28, 35, 42, 44, 44, 38, 24, 44, 41, 52, 62, 27]
+    var possibleX = [12, 22, 32, 41, 49, 39, 43, 59, 70, 61, 53, 59, 69, 13, 78, 9, 9, 13, 4, 22, 27, 27, 36, 45, 40, 38, 58]
+    var possibleY = [7, 5, 7, 8, 14, 28, 35, 42, 18, 8, 58, 6, 61, 64, 76, 28, 35, 42, 44, 44, 38, 24, 44, 41, 52, 62, 27]
 
     var chestspawner = setInterval(() => {
 

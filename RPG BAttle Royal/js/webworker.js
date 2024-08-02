@@ -57,12 +57,14 @@ self.onmessage = function(e) {
 		value=value.split(":")
 		if(value.length>2){value.shift();ip=value.slice(0,3).join(":");value=value.slice(3,value.length).join(":")}
 		else {value.shift();ip=value[0]}
+
 		connection = new WebSocket(ip)
 
 		connection.onopen = function () {
 			self.postMessage("connected")	
 			connection.send("pass:"+publicKey+":"+value)
 		}
+		
 
 		connection.onmessage=function(e){
 			update=e.data
